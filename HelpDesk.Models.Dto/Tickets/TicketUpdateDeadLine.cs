@@ -5,5 +5,5 @@ namespace HelpDesk.Models.Dto.Tickets;
 
 public class TicketUpdateDeadLine : WithId
 {
-    public DateTime UpdatedAt { get; set; }
+    public DateTime Deadline { get; set; }
 }
