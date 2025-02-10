@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\HelpDesk.Models.Dto\HelpDesk.Models.Dto.csproj" />
+      <ProjectReference Include="..\HelpDesk.Models.PLA\HelpDesk.Models.PLA.csproj" />
+      <ProjectReference Include="..\HelpDesk.Storage\HelpDesk.Storage.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Mapster" Version="7.4.2-pre02" />
+    </ItemGroup>
+
+</Project>
