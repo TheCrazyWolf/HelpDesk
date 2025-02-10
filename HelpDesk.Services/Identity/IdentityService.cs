@@ -11,9 +11,9 @@ namespace HelpDesk.Services.Identity;
 
 public class IdentityService(HelpDeskContext ef, IMapper mapper)
 {
-    public async Task<IList<IdentityView>> GetIdentityViews(IdentityEnum identityEnum)
+    public async Task<IList<IdentityView>> GetIdentityViews(IdentityType identityType)
     {
-        return mapper.Map<IList<IdentityView>>(await ef.Accounts.Where(x => x.IdentityType == identityEnum)
+        return mapper.Map<IList<IdentityView>>(await ef.Accounts.Where(x => x.IdentityType == identityType)
             .ToListAsync());
     }
     

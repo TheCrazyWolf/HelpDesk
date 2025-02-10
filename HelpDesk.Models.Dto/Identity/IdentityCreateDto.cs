@@ -8,5 +8,5 @@ public class IdentityCreateDto
     public string LastName { get; set; } = string.Empty;
     public string MiddleName { get; set; } = string.Empty;
     public string Login { get; set; } = string.Empty;
-    public IdentityEnum IdentityType { get; set; }
+    public IdentityType IdentityType { get; set; }
 }

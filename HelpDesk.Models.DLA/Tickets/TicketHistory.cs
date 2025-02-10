@@ -10,4 +10,5 @@ public class TicketHistory : DlaEntity
     [ForeignKey("UserId")] public Account? User { get; set; }
     public string Message { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public bool IsHideForUser { get; set; }
 }

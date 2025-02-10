@@ -11,5 +11,7 @@ public class Account : DlaEntity
     public string Login { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public long? TelegramId { get; set; }
-    public IdentityEnum IdentityType { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public IdentityType IdentityType { get; set; }
 }

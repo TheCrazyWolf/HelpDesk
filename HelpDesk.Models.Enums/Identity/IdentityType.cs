@@ -2,7 +2,7 @@
 
 namespace HelpDesk.Models.Enums.Identity;
 
-public enum IdentityEnum
+public enum IdentityType
 {
     [Display(Name = "Студент")]
     Student,

@@ -5,5 +5,5 @@ namespace HelpDesk.Models.Dto.Identity;
 
 public class IdentityChaneRole : WithId
 {
-    public IdentityEnum IdentityType { get; set; }
+    public IdentityType IdentityType { get; set; }
 }
