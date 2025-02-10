@@ -12,6 +12,7 @@ public class Ticket : DlaEntity
     public TicketType Type { get; set; }
     public TicketStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public long? UserId { get; set; }
     [ForeignKey("UserId")] public Account? User { get; set; }
 }

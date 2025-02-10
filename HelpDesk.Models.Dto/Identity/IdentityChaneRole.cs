@@ -1,9 +1,9 @@
-﻿using HelpDesk.Models.Enums.Identity;
+﻿using HelpDesk.Models.Dto.Common;
+using HelpDesk.Models.Enums.Identity;
 
 namespace HelpDesk.Models.Dto.Identity;
 
-public class IdentityChaneRole
+public class IdentityChaneRole : WithId
 {
-    public long Id { get; set; }
     public IdentityEnum IdentityType { get; set; }
 }

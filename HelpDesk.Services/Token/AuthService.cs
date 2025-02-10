@@ -1,4 +1,5 @@
 ﻿using HelpDesk.Models.Dto.Auth;
+using HelpDesk.Services.Utils;
 using HelpDesk.Storage;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ public class AuthService(HelpDeskContext ef, IMapper mapper)
 {
     public async Task<DeskToken?> AuthenticateUser(LoginParams loginParams)
     {
-        var user = await ef.Accounts.FirstOrDefaultAsync(x=> x.Password == loginParams.Password 
+        var user = await ef.Accounts.FirstOrDefaultAsync(x=> x.Password == loginParams.Password.GetHash() 
                                                              && x.Login == loginParams.Username);
 
         if (user is not null)

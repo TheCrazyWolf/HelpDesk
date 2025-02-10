@@ -16,4 +16,8 @@
       <PackageReference Include="Mapster" Version="7.4.2-pre02" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Tickets\" />
+    </ItemGroup>
+
 </Project>

@@ -2,10 +2,8 @@
 
 namespace HelpDesk.Services.Token;
 
-public class TokenEncryptionService
+public class TokenEncryptionService(string encryptionKey)
 {
-    private const string EncryptionKey = "Token";
-    
     public async Task<string> EncryptToken(DeskToken token)
     {
         return string.Empty;
@@ -16,8 +14,13 @@ public class TokenEncryptionService
         return new DeskToken();
     }
 
-    public bool IsValideted(DeskToken token)
+    public bool IsValid(DeskToken token)
     {
         return token.ExpiresAt <= DateTime.Now;
+    }
+    
+    public bool IsValid(string token)
+    {
+        return IsValid(DecryptToken(token).GetAwaiter().GetResult());
     }
 }

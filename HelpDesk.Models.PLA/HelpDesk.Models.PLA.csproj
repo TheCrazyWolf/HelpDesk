@@ -10,4 +10,8 @@
       <ProjectReference Include="..\HelpDesk.Models.Enums\HelpDesk.Models.Enums.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Documents\" />
+    </ItemGroup>
+
 </Project>

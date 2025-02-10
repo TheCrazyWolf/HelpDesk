@@ -1,7 +1,8 @@
-﻿namespace HelpDesk.Models.Dto.Identity;
+﻿using HelpDesk.Models.Dto.Common;
 
-public class IdentityChangePassword
+namespace HelpDesk.Models.Dto.Identity;
+
+public class IdentityChangePassword : WithId
 {
-    public long Id { get; set; }
     public string Password { get; set; } = string.Empty;
 }

@@ -1,10 +1,10 @@
-﻿using HelpDesk.Models.Enums.Identity;
+﻿using HelpDesk.Models.Dto.Common;
+using HelpDesk.Models.Enums.Identity;
 
 namespace HelpDesk.Models.Dto.Auth;
 
-public class DeskToken
+public class DeskToken : WithId
 {
-    public long Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string MiddleName { get; set; } = string.Empty;
