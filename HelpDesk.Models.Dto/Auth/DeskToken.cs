@@ -14,7 +14,7 @@ public class DeskToken : WithId
 
     public bool IsValid()
     {
-        return ExpiresAt <= DateTime.Now;
+        return ExpiresAt >= DateTime.Now;
     }
 
 }
