@@ -1,4 +1,5 @@
-﻿using HelpDesk.Models.Dto.Identity;
+﻿using HelpDesk.Models.DLA.Identity;
+using HelpDesk.Models.Dto.Identity;
 using HelpDesk.Models.Enums.Identity;
 using HelpDesk.Models.PLA.Accounts;
 using HelpDesk.Services.Utils;
@@ -10,6 +11,10 @@ namespace HelpDesk.Services.Identity;
 
 public class IdentityService(HelpDeskContext ef, IMapper mapper)
 {
+    public async Task<Account?> GetAccountById(long? id)
+    {
+        return await ef.Accounts.FirstOrDefaultAsync(x=> x.Id == id);
+    }
     public async Task<IList<IdentityView>> GetIdentityViews(IdentityType identityType)
     {
         return mapper.Map<IList<IdentityView>>(await ef.Accounts.Where(x => x.IdentityType == identityType)

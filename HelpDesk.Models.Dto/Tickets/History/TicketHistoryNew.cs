@@ -21,5 +21,13 @@ public class TicketHistoryNew
         IsHideForUser = isHideForUser;
         DocumentsIds = documentsIds;
     }
+    
+    public TicketHistoryNew(long? ticketId, long? userId, string message, bool isHideForUser)
+    {
+        TicketId = ticketId ?? throw new NullReferenceException(nameof(ticketId));
+        UserId = userId ?? throw new NullReferenceException(nameof(userId));
+        Message = message;
+        IsHideForUser = isHideForUser;
+    }
 
 }
