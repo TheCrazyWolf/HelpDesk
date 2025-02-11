@@ -14,4 +14,7 @@ public enum TicketType
 
     [Display(Name = "Закупка оборудования/Списание")]
     Purchase,
+    
+    [Display(Name = "Другое")]
+    Any,
 }
