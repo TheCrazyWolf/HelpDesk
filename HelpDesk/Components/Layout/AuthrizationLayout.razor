@@ -11,8 +11,14 @@
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 <MudLayout Style="height: 100vh;">
-    <MudStack Style="height: 100vh;" Row="false" Justify="Justify.Center" AlignItems="AlignItems.Center">
+    <MudStack Style="height: 100vh;" Spacing="0" Row="false" Justify="Justify.Center" AlignItems="AlignItems.Center">
         @Body
+        <MudText Class="mt-4 mb-0" Style="color: white" Typo="Typo.body2">
+            @ThisAssembly.Git.Branch/@ThisAssembly.Git.Commit от @ThisAssembly.Git.CommitDate
+        </MudText>
+        <MudText Class="mt-0" Style="color: white" Typo="Typo.body2">
+            Alex Kulagin
+        </MudText>
     </MudStack>
 </MudLayout>
 
