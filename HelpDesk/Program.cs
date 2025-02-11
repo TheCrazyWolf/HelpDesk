@@ -1,10 +1,13 @@
 using MudBlazor.Services;
 using HelpDesk.Components;
+using HelpDesk.Storage;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
+builder.Services.AddScoped<HelpDeskContext>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -28,5 +31,11 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<HelpDeskContext>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();
