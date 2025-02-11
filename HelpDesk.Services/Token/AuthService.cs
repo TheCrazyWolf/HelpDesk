@@ -28,8 +28,8 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
         }
         
         var result = await mfcServiceLogon.Login(loginParams);
-        if(result is null || result.Code is "404") throw new Exception("Неверный логин или пароль.");
-        
+        if(result is null) throw new Exception("Не удалось установить связь с mfc.samgk.ru. Попробуйте позднее.");
+        if(result.Code is "404") throw new Exception("Неверный логин или пароль");
         return await CreateAndGetToken(loginParams, result);
     }
 
