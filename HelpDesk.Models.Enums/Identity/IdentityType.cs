@@ -6,8 +6,8 @@ public enum IdentityType
 {
     [Display(Name = "Студент")]
     Student,
-    [Display(Name = "Преподаватель")]
-    Teacher,
+    [Display(Name = "Сотрудник")]
+    Employee,
     [Display(Name = "ИТ отдел")]
     TechSupport
 }

@@ -42,7 +42,7 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
             FirstName = mfcResult.Name,
             LastName = mfcResult.Surname,
             MiddleName = mfcResult.Patronymic,
-            IdentityType = mfcResult.IsTeacher ? IdentityType.Teacher : IdentityType.Student,
+            IdentityType = mfcResult.IsTeacher ? IdentityType.Employee : IdentityType.Student,
             IsMfcIntegration = true
         };
         
