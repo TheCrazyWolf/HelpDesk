@@ -18,7 +18,6 @@ public class DocumentService(HelpDeskContext ef, IMapper mapper)
         return mapper.Map<IList<DeskDocumentView>>(await ef.Documents.Where(x => x.TicketHistoryId == idHistoryTicket).ToListAsync());
     }
     
-    
     public async Task DeleteDocumentId(long idDocument)
     {
         var document = await ef.Documents.FirstOrDefaultAsync(x=> x.Id == idDocument);
