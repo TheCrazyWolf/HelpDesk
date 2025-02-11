@@ -21,7 +21,7 @@ builder.Services.AddSingleton<MfcServiceLogon>();
 builder.Services.AddSingleton<IAesService, AesService>();
 builder.Services.AddSingleton<IMapper, Mapper>();
 builder.Services.AddSingleton<TokenEncryptionService>(s =>
-    new TokenEncryptionService("12345678", s.GetRequiredService<IAesService>()));
+    new TokenEncryptionService("12345678901234567890123456789012", s.GetRequiredService<IAesService>()));
 builder.Services.AddBlazoredLocalStorage();
 
 // Add services to the container.

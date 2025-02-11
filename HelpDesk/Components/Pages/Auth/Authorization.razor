@@ -1,0 +1,37 @@
+﻿@page "/auth/login"
+@page "/auth"
+
+@using HelpDesk.Components.Layout
+@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Utils
+
+@layout AuthrizationLayout
+@inject StorageSession Session
+
+<h3>Authorization</h3>
+
+<EditForm Model="@_loginFormParams" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator/>
+    <MudCard>
+        <MudTextField Label="Логин" 
+                      @bind-Value="_loginFormParams.Username" For="@(() => _loginFormParams.Username)"/>
+        <MudTextField Label="Пароль" 
+                      InputType="InputType.Password" @bind-Value="_loginFormParams.Password" For="@(() => _loginFormParams.Password)"/>
+        <MudCheckBox @bind-Value="_loginFormParams.IsRememberMe" For="@(() => _loginFormParams.IsRememberMe)" Label="Запомнить меня"></MudCheckBox>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Авторизоваться</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+
+    private LoginParams _loginFormParams = new();
+
+    private async Task OnValidSubmit(EditContext arg)
+    {
+        await Session.Login(_loginFormParams);
+        Console.WriteLine("");
+    }
+
+}

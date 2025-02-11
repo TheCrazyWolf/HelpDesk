@@ -15,7 +15,7 @@ public class TokenEncryptionService(string encryptionKey, IAesService aesService
     {
         try
         {
-            return JsonConvert.DeserializeObject<DeskToken>(aesService.Encrypt(token, encryptionKey));
+            return JsonConvert.DeserializeObject<DeskToken>(aesService.Decrypt(token, encryptionKey));
         }
         catch
         {
