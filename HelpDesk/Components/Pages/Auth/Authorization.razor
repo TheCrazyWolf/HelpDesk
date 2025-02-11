@@ -7,31 +7,95 @@
 
 @layout AuthrizationLayout
 @inject StorageSession Session
+@inject NavigationManager Navigation
 
-<h3>Authorization</h3>
+
+<PageTitle>HelpDesk: Вход в систему</PageTitle>
 
 <EditForm Model="@_loginFormParams" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator/>
-    <MudCard>
-        <MudTextField Label="Логин" 
-                      @bind-Value="_loginFormParams.Username" For="@(() => _loginFormParams.Username)"/>
-        <MudTextField Label="Пароль" 
-                      InputType="InputType.Password" @bind-Value="_loginFormParams.Password" For="@(() => _loginFormParams.Password)"/>
-        <MudCheckBox @bind-Value="_loginFormParams.IsRememberMe" For="@(() => _loginFormParams.IsRememberMe)" Label="Запомнить меня"></MudCheckBox>
+    <MudCard Style="padding: 15px;" Class="p-5">
+        <MudText Typo="Typo.h6">Вход в систему</MudText>
+        @if (!string.IsNullOrEmpty(_stringErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error"
+                      ShowCloseIcon="true" CloseIconClicked="(() => _stringErrorMessage = string.Empty)">
+                @_stringErrorMessage
+            </MudAlert>
+        }
+        @if (_deskToken is null)
+        {
+            <MudAlert Class="mt-4 mb-4" Severity="Severity.Info">Используйте для входа учётные данные от личного кабинета преподавателя (mfc.samgk.ru)</MudAlert>
+            <MudTextField Class="mt-4" Label="Логин"
+                          @bind-Value="_loginFormParams.Username" For="@(() => _loginFormParams.Username)"/>
+            <MudTextField Label="Пароль"
+                          InputType="InputType.Password" @bind-Value="_loginFormParams.Password" For="@(() => _loginFormParams.Password)"/>
+            <MudCheckBox @bind-Value="_loginFormParams.IsRememberMe" For="@(() => _loginFormParams.IsRememberMe)" Label="Запомнить меня"></MudCheckBox>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info">
+                Вы авторизованы в системе как: @_deskToken.LastName @_deskToken.FirstName
+            </MudAlert>
+        }
         <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Авторизоваться</MudButton>
+            @if (_deskToken is null)
+            {
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
+                           DropShadow="false"
+                           Color="Color.Primary" >
+                    Авторизоваться
+                </MudButton>
+            }
+            else
+            {
+                <MudStack Row="true" Spacing="0" Justify="Justify.FlexStart">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
+                               DropShadow="false" Href="/" Class="me-2"
+                               Color="Color.Primary" >
+                        Вернутся
+                    </MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
+                               DropShadow="false"
+                               OnClick="() => ClearSession()"
+                               Color="Color.Primary" >
+                        Выйти
+                    </MudButton>
+                </MudStack>
+            }
         </MudCardActions>
     </MudCard>
 </EditForm>
 
 @code {
 
-    private LoginParams _loginFormParams = new();
+    private readonly LoginParams _loginFormParams = new();
+    private string _stringErrorMessage = string.Empty;
+    private DeskToken? _deskToken;
 
     private async Task OnValidSubmit(EditContext arg)
     {
-        await Session.Login(_loginFormParams);
-        Console.WriteLine("");
+        try
+        {
+            await Session.Login(_loginFormParams);
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            _stringErrorMessage = e.Message;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _deskToken = await Session.GetCurrentAccessToken();
+    }
+
+    private async void ClearSession()
+    {
+        Session.ClearSession();
+        _deskToken = null;
     }
 
 }
