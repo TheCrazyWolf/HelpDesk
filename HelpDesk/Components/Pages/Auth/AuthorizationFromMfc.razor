@@ -1,0 +1,46 @@
+﻿@page "/auth/login/mfc"
+
+@using HelpDesk.Components.Layout
+@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Utils
+
+@layout AuthrizationLayout
+@inject StorageSession Session
+@inject NavigationManager Navigation
+
+
+<PageTitle>HelpDesk: Вход в систему</PageTitle>
+
+
+
+<MudCard Style="padding: 18px 20px 18px 20px;" Class="p-5">
+    <MudText Typo="Typo.h6">HelpDesk: Вход в систему</MudText>
+    <MudAlert Class="mt-4 " Severity="Severity.Normal">Вы будете автоматически перенаправлены на главную страницу после
+        успешного входа
+    </MudAlert>
+    <MudStack Class="mt-4" Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None"
+              Justify="Justify.SpaceBetween">
+        @if (_deskToken is null)
+        {
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+        }
+    </MudStack>
+</MudCard>
+
+@code {
+    
+    [Parameter] [SupplyParameterFromQuery] public string AccessToken { get; set; } = string.Empty;
+    private DeskToken? _deskToken;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _deskToken = await Session.GetCurrentAccessToken();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+}
