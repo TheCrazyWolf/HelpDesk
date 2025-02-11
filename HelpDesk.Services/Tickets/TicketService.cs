@@ -1,5 +1,6 @@
 ﻿using HelpDesk.Models.DLA.Tickets;
 using HelpDesk.Models.Dto.Tickets;
+using HelpDesk.Models.Dto.Tickets.Tickets;
 using HelpDesk.Services.Documents;
 using HelpDesk.Storage;
 using MapsterMapper;

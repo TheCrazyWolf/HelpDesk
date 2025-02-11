@@ -1,6 +1,6 @@
 ﻿using HelpDesk.Models.Dto.Identity;
 using HelpDesk.Models.Enums.Identity;
-using HelpDesk.Models.PLA.Account;
+using HelpDesk.Models.PLA.Accounts;
 using HelpDesk.Services.Utils;
 using HelpDesk.Storage;
 using MapsterMapper;

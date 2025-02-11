@@ -1,6 +1,6 @@
 ﻿using HelpDesk.Models.Enums.Tickets;
 
-namespace HelpDesk.Models.Dto.Tickets;
+namespace HelpDesk.Models.Dto.Tickets.Tickets;
 
 public class TicketCreateDto
 {

@@ -1,5 +1,5 @@
 ﻿using HelpDesk.Models.Enums.Tickets;
-using HelpDesk.Models.PLA.Account;
+using HelpDesk.Models.PLA.Accounts;
 using HelpDesk.Models.PLA.Common;
 
 namespace HelpDesk.Models.PLA.Tickets;
