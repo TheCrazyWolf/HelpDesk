@@ -14,7 +14,8 @@ public class MfcServiceLogon
         try
         {
             var options = new RestRequest("api/auth-new", Method.Post);
-            options.AddBody(loginParams);
+            options.AddParameter("username", loginParams.Username);
+            options.AddParameter("password", loginParams.Password);
             return JsonConvert.DeserializeObject<AuthMfcResult>((await _restClient.ExecuteAsync(options)).Content ?? string.Empty);
         }
         catch

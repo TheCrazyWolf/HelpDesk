@@ -26,7 +26,7 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
         }
         
         var result = await mfcServiceLogon.Login(loginParams);
-        if(result is null) throw new Exception("Неверный логин или пароль.");
+        if(result is null || result.Code is "404") throw new Exception("Неверный логин или пароль.");
         
         return await CreateAndGetToken(loginParams, result);
     }
