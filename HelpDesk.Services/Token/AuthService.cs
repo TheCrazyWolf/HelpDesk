@@ -43,7 +43,7 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
             LastName = mfcResult.Surname,
             MiddleName = mfcResult.Patronymic,
             IdentityType = mfcResult.IsTeacher ? IdentityType.Teacher : IdentityType.Student,
-            IsMfcIntegation = true
+            IsMfcIntegration = true
         };
         
         await ef.AddAsync(user);

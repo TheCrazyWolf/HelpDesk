@@ -42,7 +42,7 @@ public class IdentityService(HelpDeskContext ef, IMapper mapper)
     {
         var user = await ef.Accounts.FirstOrDefaultAsync(x => x.Id == changeLogin.Id);
         if (user is null) throw new NullReferenceException("Пользователь не найден");
-        if(user.IsMfcIntegation) throw new NullReferenceException("Эта учётная связана с mfc.samgk.ru. Менять логины или пароль запрещено.");
+        if(user.IsMfcIntegration) throw new NullReferenceException("Эта учётная связана с mfc.samgk.ru. Менять логины или пароль запрещено.");
         var newLogin = await ef.Accounts.FirstOrDefaultAsync(x => x.Login == changeLogin.UserName);
         if (newLogin is not null) throw new NullReferenceException("Этот логин уже используется");
         mapper.Map(changeLogin, user);
@@ -53,7 +53,7 @@ public class IdentityService(HelpDeskContext ef, IMapper mapper)
     {
         var user = await ef.Accounts.FirstOrDefaultAsync(x => x.Id == changePassword.Id);
         if (user is null) throw new NullReferenceException("Пользователь не найден");
-        if(user.IsMfcIntegation) throw new NullReferenceException("Эта учётная связана с mfc.samgk.ru. Менять логины или пароль запрещено.");
+        if(user.IsMfcIntegration) throw new NullReferenceException("Эта учётная связана с mfc.samgk.ru. Менять логины или пароль запрещено.");
         changePassword.Password = changePassword.Password.GetHash();
         mapper.Map(changePassword, user);
         await ef.SaveChangesAsync();
