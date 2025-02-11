@@ -1,26 +1,25 @@
-﻿using HelpDesk.Models.Dto.Auth;
+﻿using Aes.Encryptor.Interfaces;
+using HelpDesk.Models.Dto.Auth;
+using Newtonsoft.Json;
 
 namespace HelpDesk.Services.Token;
 
-public class TokenEncryptionService(string encryptionKey)
+public class TokenEncryptionService(string encryptionKey, IAesService aesService)
 {
-    public async Task<string> EncryptToken(DeskToken token)
+    public string EncryptToken(DeskToken token)
     {
-        return string.Empty;
+        return aesService.Encrypt(JsonConvert.SerializeObject(token), encryptionKey);
     }
 
-    public async Task<DeskToken> DecryptToken(string token)
+    public DeskToken? DecryptToken(string? token)
     {
-        return new DeskToken();
-    }
-
-    public bool IsValid(DeskToken token)
-    {
-        return token.ExpiresAt <= DateTime.Now;
-    }
-    
-    public bool IsValid(string token)
-    {
-        return IsValid(DecryptToken(token).GetAwaiter().GetResult());
+        try
+        {
+            return JsonConvert.DeserializeObject<DeskToken>(aesService.Encrypt(token, encryptionKey));
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

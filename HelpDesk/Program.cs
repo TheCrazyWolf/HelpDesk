@@ -1,6 +1,13 @@
+using Aes.Encryptor.Interfaces;
+using Aes.Encryptor.Services;
+using Blazored.LocalStorage;
 using MudBlazor.Services;
 using HelpDesk.Components;
+using HelpDesk.Mfc.Authorization;
+using HelpDesk.Services.Token;
 using HelpDesk.Storage;
+using HelpDesk.Utils;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MudBlazor services
 builder.Services.AddMudServices();
 builder.Services.AddScoped<HelpDeskContext>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<StorageSession>();
+builder.Services.AddSingleton<MfcServiceLogon>();
+builder.Services.AddSingleton<IAesService, AesService>();
+builder.Services.AddSingleton<IMapper, Mapper>();
+builder.Services.AddSingleton<TokenEncryptionService>(s =>
+    new TokenEncryptionService("12345678", s.GetRequiredService<IAesService>()));
+builder.Services.AddBlazoredLocalStorage();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

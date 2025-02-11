@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Utils
+@inherits LayoutComponentBase
+@inject StorageSession Session
+@inject NavigationManager Navigation
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
@@ -31,11 +35,14 @@
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
+    private DeskToken? _deskToken;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
-
+        await base.OnInitializedAsync();
+        _deskToken = await Session.GetCurrentAccessToken();
+        if(_deskToken is null || !_deskToken.IsValid()) Navigation.NavigateTo("/auth/login");
+        
         _theme = new()
         {
             PaletteLight = _lightPalette,
@@ -44,6 +51,7 @@
         };
     }
 
+    
     private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;

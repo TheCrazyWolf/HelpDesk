@@ -8,11 +8,14 @@
 
 
     <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
         <PackageReference Include="MudBlazor" Version="8.*"/>
     </ItemGroup>
 
 
     <ItemGroup>
+      <ProjectReference Include="..\HelpDesk.Mfc.Authorization\HelpDesk.Mfc.Authorization.csproj" />
+      <ProjectReference Include="..\HelpDesk.Services\HelpDesk.Services.csproj" />
       <ProjectReference Include="..\HelpDesk.Storage\HelpDesk.Storage.csproj" />
     </ItemGroup>
 </Project>

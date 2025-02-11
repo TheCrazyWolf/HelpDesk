@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\HelpDesk.Mfc.Authorization\HelpDesk.Mfc.Authorization.csproj" />
       <ProjectReference Include="..\HelpDesk.Models.Dto\HelpDesk.Models.Dto.csproj" />
       <ProjectReference Include="..\HelpDesk.Models.PLA\HelpDesk.Models.PLA.csproj" />
       <ProjectReference Include="..\HelpDesk.Storage\HelpDesk.Storage.csproj" />
@@ -14,6 +15,7 @@
 
     <ItemGroup>
       <PackageReference Include="Mapster" Version="7.4.2-pre02" />
+      <PackageReference Include="Utilities.AesEncryptor" Version="8.0.945" />
     </ItemGroup>
 
 </Project>

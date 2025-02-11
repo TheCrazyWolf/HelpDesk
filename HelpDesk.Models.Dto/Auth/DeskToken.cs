@@ -11,4 +11,10 @@ public class DeskToken : WithId
     public IdentityType Role { get; set; }
     public DateTime StartAt { get; set; }
     public DateTime ExpiresAt { get; set; }
+
+    public bool IsValid()
+    {
+        return ExpiresAt <= DateTime.Now;
+    }
+
 }
