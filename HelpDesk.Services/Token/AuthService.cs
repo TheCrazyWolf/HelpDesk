@@ -14,6 +14,8 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
 {
     public async Task<DeskToken?> AuthenticateUser(LoginParams loginParams)
     {
+        loginParams.Username = loginParams.Username.ToLower();
+        loginParams.Password = loginParams.Password.ToLower();
         var user = await ef.Accounts.FirstOrDefaultAsync(x=> x.Password == loginParams.Password.GetHash() 
                                                              && x.Login == loginParams.Username);
 
