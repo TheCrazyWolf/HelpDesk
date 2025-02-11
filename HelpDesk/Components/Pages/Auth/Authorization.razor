@@ -31,8 +31,10 @@
             }
 
             <MudTextField Class="mt-4" Label="Логин"
+                          Disabled="_isBusy"
                           @bind-Value="_loginFormParams.Username" For="@(() => _loginFormParams.Username)"/>
             <MudTextField Label="Пароль" Style="padding-left: 0;"
+                          Disabled="_isBusy"
                           InputType="InputType.Password" @bind-Value="_loginFormParams.Password"
                           For="@(() => _loginFormParams.Password)"/>
         }
@@ -48,9 +50,11 @@
             {
                 <MudCheckBox @bind-Value="_loginFormParams.IsRememberMe" For="@(() => _loginFormParams.IsRememberMe)"
                              Class="me-2"
+                             Disabled="_isBusy"
                              Label="Запомнить меня"></MudCheckBox>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
                            DropShadow="false"
+                           Disabled="_isBusy"
                            Color="Color.Primary">
                     Авторизоваться
                 </MudButton>
@@ -78,9 +82,11 @@
     private readonly LoginParams _loginFormParams = new();
     private string _stringErrorMessage = string.Empty;
     private DeskToken? _deskToken;
+    private bool _isBusy = false;
 
     private async Task OnValidSubmit(EditContext arg)
     {
+        _isBusy = true;
         try
         {
             await Session.Login(_loginFormParams);
@@ -90,6 +96,7 @@
         {
             _stringErrorMessage = e.Message;
         }
+        _isBusy = false;
     }
 
     protected override async Task OnInitializedAsync()
