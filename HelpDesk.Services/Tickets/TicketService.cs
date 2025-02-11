@@ -1,6 +1,7 @@
 ﻿using HelpDesk.Models.DLA.Tickets;
 using HelpDesk.Models.Dto.Tickets;
 using HelpDesk.Models.Dto.Tickets.Tickets;
+using HelpDesk.Models.PLA.Tickets;
 using HelpDesk.Services.Documents;
 using HelpDesk.Storage;
 using MapsterMapper;
@@ -10,6 +11,14 @@ namespace HelpDesk.Services.Tickets;
 
 public class TicketService(HelpDeskContext ef, DocumentService documentService, IMapper mapper)
 {
+
+    public async Task<TicketView?> GetTicket(long idTicket)
+    {
+        var ticket = await ef.Tickets.FirstOrDefaultAsync(t => t.Id == idTicket);
+        if (ticket == null) throw new Exception("Заявка не найдена");
+        return mapper.Map<TicketView>(ticket);
+    }
+    
     public async Task<long> CreateTicket(TicketCreateDto ticket)
     {
         var ticketEntity = mapper.Map<Ticket>(ticket);

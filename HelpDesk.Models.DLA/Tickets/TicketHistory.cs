@@ -8,7 +8,9 @@ public class TicketHistory : DlaEntity
 {
     public long? UserId { get; set; }
     [ForeignKey("UserId")] public Account? User { get; set; }
+    public long? TicketId { get; set; }
+    [ForeignKey("TicketId")] public Ticket? Ticket { get; set; }
     public string Message { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Today;
     public bool IsHideForUser { get; set; }
 }

@@ -44,4 +44,21 @@ public class DocumentService(HelpDeskContext ef, IMapper mapper)
         }
         await ef.SaveChangesAsync();
     }
+
+    public async Task AttachDocumentToTicketHistory(TicketHistory ticketHistoryEntity, IList<long> ticketHistoryDocumentsIds)
+    {
+        await AttachDocumentToTicketHistory(ticketHistoryEntity.Id, ticketHistoryDocumentsIds);
+    }
+    
+    public async Task AttachDocumentToTicketHistory(long idTicketHistoryEntity, IList<long> ticketHistoryDocumentsIds)
+    {
+        foreach (var ticketDocumentId in ticketHistoryDocumentsIds)
+        {
+            var document = await ef.Documents.FirstOrDefaultAsync(x=> x.Id == ticketDocumentId);
+            if(document is null) continue;
+            document.TicketHistoryId = idTicketHistoryEntity;
+            ef.Update(document);
+        }
+        await ef.SaveChangesAsync();
+    }
 }
