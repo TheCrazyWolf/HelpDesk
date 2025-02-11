@@ -41,7 +41,7 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
             Password = loginParams.Password.GetHash(),
             FirstName = mfcResult.Name,
             LastName = mfcResult.Surname,
-            MiddleName = mfcResult.Name,
+            MiddleName = mfcResult.Patronymic,
             IdentityType = mfcResult.IsTeacher ? IdentityType.Teacher : IdentityType.Student,
         };
         
