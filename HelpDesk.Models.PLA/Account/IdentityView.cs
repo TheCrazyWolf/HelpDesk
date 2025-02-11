@@ -3,7 +3,7 @@ using HelpDesk.Models.PLA.Common;
 
 namespace HelpDesk.Models.PLA.Account;
 
-public class IdentityView : DlaEntity
+public class IdentityView : PlaEntity
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

@@ -3,7 +3,7 @@ using HelpDesk.Models.PLA.Common;
 
 namespace HelpDesk.Models.PLA.Tickets;
 
-public class TicketHistoryView : DlaEntity
+public class TicketHistoryView : PlaEntity
 {
     public IdentityView? CreatedBy { get; set; }
     public string Message { get; set; } = string.Empty;

@@ -4,7 +4,7 @@ using HelpDesk.Models.PLA.Common;
 
 namespace HelpDesk.Models.PLA.Tickets;
 
-public class TicketView : DlaEntity
+public class TicketView : PlaEntity
 {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
