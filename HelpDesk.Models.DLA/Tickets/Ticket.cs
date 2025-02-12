@@ -13,7 +13,7 @@ public class Ticket : DlaEntity
     public TicketType Type { get; set; }
     public TicketStatus Status { get; set; }
     public TicketLevelPriority Priority { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? Deadline { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public long? UserId { get; set; }

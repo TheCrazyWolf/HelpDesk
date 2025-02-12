@@ -10,4 +10,15 @@ public class DeviceInUseTicket : DlaEntity
     [ForeignKey("DeviceId")] public Device? Device { get; set; }
     public long? TicketId { get; set; }
     [ForeignKey("TicketId")] public Ticket? Ticket { get; set; }
+
+    public DeviceInUseTicket()
+    {
+        
+    }
+
+    public DeviceInUseTicket(string? deviceId, long? ticketId)
+    {
+        DeviceId = deviceId;
+        TicketId = ticketId;
+    }
 }

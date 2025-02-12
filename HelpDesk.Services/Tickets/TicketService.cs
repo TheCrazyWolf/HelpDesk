@@ -1,6 +1,7 @@
 ﻿using HelpDesk.Models.DLA.Tickets;
 using HelpDesk.Models.Dto.Tickets.Tickets;
 using HelpDesk.Models.PLA.Tickets;
+using HelpDesk.Services.Devices;
 using HelpDesk.Services.Documents;
 using HelpDesk.Storage;
 using MapsterMapper;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Services.Tickets;
 
-public class TicketService(HelpDeskContext ef, DocumentService documentService, IMapper mapper)
+public class TicketService(HelpDeskContext ef, DeviceInUseService deviceInUseService, DocumentService documentService, IMapper mapper)
 {
 
     public async Task<TicketView?> GetTicket(long idTicket)
@@ -24,6 +25,7 @@ public class TicketService(HelpDeskContext ef, DocumentService documentService, 
         await ef.AddAsync(ticketEntity);
         await ef.SaveChangesAsync();
         await documentService.AttachDocumentToTicket(ticketEntity, ticket.Files.Select(x=> x.Id).ToArray());
+        await deviceInUseService.AttachDeviceToTicket(ticket.Devices.Select(x => x.InvNumber), ticketEntity.Id);
         return ticketEntity.Id;
     }
 

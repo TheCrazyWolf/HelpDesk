@@ -13,23 +13,30 @@
 
 @inject TicketService TicketService
 @inject StorageSession Session
+@inject NavigationManager Navigation
 
 <MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">Создание новой заявки</MudText>
 
 <MudGrid>
     <MudItem xs="12" sm="6">
+        @if (!string.IsNullOrEmpty(_errorMsg))
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+                @_errorMsg
+            </MudAlert>
+        }
         <MudPaper Class="mt-2" Elevation="0">
             <MudText Class="mb-2">Описание проблемы</MudText>
             <MudForm >
-                <MudTextField T="string" bind-Value="_createDto.Title" Label="Тема"/>
-                <MudTextField T="string" bind-Value="_createDto.Description" Lines="6" Label="Подробное описание"/>
+                <MudTextField T="string" @bind-Value="_createDto.Title" Label="Тема"/>
+                <MudTextField T="string" @bind-Value="_createDto.Description" Lines="6" Label="Подробное описание"/>
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
-            <DeviceComponentOfTicketCreate CreateDto="_createDto" />
+            <DeviceComponentOfTicketCreate CreateDto="_createDto"/>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
-            <DocumentFilesOfTicketCreate CreateDto="_createDto" DeskToken="_deskToken" /> 
+            <DocumentFilesOfTicketCreate CreateDto="_createDto" DeskToken="_deskToken"/>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6">
@@ -55,7 +62,10 @@
                 <MudTextField T="string" bind-Value="_createDto.PlaceOfIssue" Label="Место ЧП"/>
                 <MudStack Class="mt-4" Row="true" Spacing="0">
                     <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Send"
-                               Color="Color.Primary">Отправить</MudButton>
+                               OnClick="Sumbit"
+                               Color="Color.Primary">
+                        Отправить
+                    </MudButton>
                 </MudStack>
             </MudForm>
         </MudPaper>
@@ -65,11 +75,11 @@
 
 @code {
 
+    private string _errorMsg = string.Empty;
+
     private DeskToken? _deskToken;
 
-    private TicketCreateDto _createDto = new()
-    {
-    };
+    private TicketCreateDto _createDto = new();
 
     private IEnumerable<TicketView>? _tickets;
 
@@ -79,6 +89,7 @@
         await base.OnInitializedAsync();
         _deskToken = await Session.GetCurrentAccessToken();
         if (_deskToken is null) return;
+        _createDto.UserId = _deskToken.Id;
         await LoadTickets();
     }
 
@@ -91,14 +102,21 @@
         }
         catch (Exception e)
         {
-            // show window
+            _errorMsg = e.Message;
         }
     }
+
     
-
-    private Task DownloadFile(long fileId)
+    public async Task Sumbit()
     {
-        throw new NotImplementedException();
+        try
+        {
+            var ticketId = await TicketService.CreateTicket(_createDto);
+            Navigation.NavigateTo($"/tickets/form/{ticketId}");
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
     }
-
 }
