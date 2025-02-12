@@ -110,6 +110,6 @@ public class DocumentService(HelpDeskContext ef, IMapper mapper)
 
     public async Task<bool> IsUsedDocument(long documentId)
     {
-        return await ef.Documents.AnyAsync(x=> x.TicketHistoryId  != null || x.TicketId != null);
+        return await ef.Documents.AnyAsync(x=> x.Id == documentId && (x.TicketHistoryId != null || x.TicketId != null));
     }
 }

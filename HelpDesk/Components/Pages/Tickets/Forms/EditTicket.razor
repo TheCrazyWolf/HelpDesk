@@ -1,40 +1,37 @@
 ﻿@page "/tickets/form/{id:long}/"
 
 @using HelpDesk.Models.Dto.Auth
-@using HelpDesk.Models.Dto.Tickets.Tickets
-@using HelpDesk.Models.Enums.Extensions
-@using HelpDesk.Models.Enums.Tickets
 @using HelpDesk.Services.Tickets
 @using HelpDesk.Utils
-@using HelpDesk.Components.Pages.Tickets.CreateTicket.Components
 @using HelpDesk.Models.PLA.Tickets
 
 @inject TicketService TicketService
 @inject StorageSession Session
-@inject NavigationManager Navigation
 
-<MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">Создание новой заявки</MudText>
+<MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">@_ticket?.Title</MudText>
+<MudText Typo="Typo.body2" GutterBottom="true" Align="Align.Start">№ @_ticket?.Id</MudText>
+
+@if (!string.IsNullOrEmpty(_errorMsg))
+{
+    <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+        @_errorMsg
+    </MudAlert>
+}
 
 <MudGrid>
     <MudItem xs="12" sm="6">
-        @if (!string.IsNullOrEmpty(_errorMsg))
-        {
-            <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
-                @_errorMsg
-            </MudAlert>
-        }
         <MudPaper Class="mt-2" Elevation="0">
             <MudText Class="mb-2">Описание проблемы</MudText>
             <MudForm >
-                <MudTextField T="string" @bind-Value="_createDto.Title" Label="Тема"/>
-                <MudTextField T="string" @bind-Value="_createDto.Description" Lines="6" Label="Подробное описание"/>
+                <MudTextField T="string" Label="Тема"/>
+                <MudTextField T="string" Lines="6" Label="Подробное описание"/>
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
-            <DeviceComponentOfTicketCreate CreateDto="_createDto"/>
+
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
-            <DocumentFilesOfTicketCreate CreateDto="_createDto" DeskToken="_deskToken"/>
+
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6">
@@ -43,28 +40,6 @@
                 Дополнительная информация
             </MudText>
             <MudForm>
-                <MudSelect @bind-Value="_createDto.Type"
-                           Label="Категория заявки">
-                    @foreach (var type in Enum.GetValues(typeof(TicketType)).Cast<TicketType>())
-                    {
-                        <MudSelectItem Value="@type">@type.GetDisplayName()</MudSelectItem>
-                    }
-                </MudSelect>
-                <MudSelect @bind-Value="_createDto.Priority"
-                           Label="Приоритет">
-                    @foreach (var levelPriority in Enum.GetValues(typeof(TicketLevelPriority)).Cast<TicketLevelPriority>())
-                    {
-                        <MudSelectItem Value="@levelPriority">@levelPriority.GetDisplayName()</MudSelectItem>
-                    }
-                </MudSelect>
-                <MudTextField T="string" bind-Value="_createDto.PlaceOfIssue" Label="Место ЧП"/>
-                <MudStack Class="mt-4" Row="true" Spacing="0">
-                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Send"
-                               OnClick="Sumbit"
-                               Color="Color.Primary">
-                        Отправить
-                    </MudButton>
-                </MudStack>
             </MudForm>
         </MudPaper>
     </MudItem>
@@ -73,27 +48,29 @@
 
 @code {
 
+    [Parameter] public long Id { get; set; }
     private string _errorMsg = string.Empty;
     protected TicketView? _ticket;
     private DeskToken? _deskToken;
-
-    private TicketCreateDto _createDto = new();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         _deskToken = await Session.GetCurrentAccessToken();
         if (_deskToken is null) return;
-        _createDto.UserId = _deskToken.Id;
         await LoadTickets();
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+    }
 
     public async Task LoadTickets()
     {
         try
         {
-            _tickets = await TicketService.ShowTicketsByAccountId(_deskToken!.Id);
+            _ticket = await TicketService.GetTicket(Id);
         }
         catch (Exception e)
         {
@@ -101,17 +78,4 @@
         }
     }
 
-    
-    public async Task Sumbit()
-    {
-        try
-        {
-            var ticketId = await TicketService.CreateTicket(_createDto);
-            Navigation.NavigateTo($"/tickets/form/{ticketId}");
-        }
-        catch (Exception e)
-        {
-            _errorMsg = e.Message;
-        }
-    }
 }
