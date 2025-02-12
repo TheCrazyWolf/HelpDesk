@@ -21,7 +21,9 @@
             ГАПОУ СО «Самарский государственный колледж»
         </MudText>
         <MudText Class="mt-4 mb-0" Style="color: white" Typo="Typo.body2">
+            @* ReSharper disable CSharpWarnings::CS0618 *@
             @ThisAssembly.Git.Branch/@ThisAssembly.Git.Commit от @ThisAssembly.Git.CommitDate
+            @* ReSharper restore CSharpWarnings::CS0618 *@
         </MudText>
         <MudText Class="mt-0" Style="color: white" Typo="Typo.body2">
             Alex Kulagin
