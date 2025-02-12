@@ -1,22 +1,37 @@
-﻿@using HelpDesk.Models.Dto.Tickets.Tickets
+﻿@using HelpDesk.Modals
+@using HelpDesk.Models.Dto.Devices
+@using HelpDesk.Models.Dto.Tickets.Tickets
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Models.PLA.Devices
+@using HelpDesk.Services.Devices
+
+@inject IDialogService DialogService
+@inject DeviceService DeviceService
 
 <MudText Class="mb-0">Оборудование учавствующие в заявке</MudText>
 <MudForm>
     <MudStack Class="mt-4" Row="true" Spacing="0">
         <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create"
                    Size="Size.Small"
+                   OnClick="ShowDialog"
                    Color="Color.Primary">
             Добавить оборудование
         </MudButton>
     </MudStack>
+    @if (!string.IsNullOrEmpty(_errorMsg))
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+            @_errorMsg
+        </MudAlert>
+    }
     <MudList Class="mt-2" T="DeviceView">
         @foreach (var device in CreateDto.Devices)
         {
             <MudListItem Icon="@Icons.Material.Filled.Devices">
                 <code>@device.Type.GetDisplayName() №@device.InvNumber</code>
-                <MudIconButton OnClick="@(() => RemoveDevice(device.InvNumber))" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Delete" Color="Color.Error"/>
+                <MudIconButton OnClick="@(() => RemoveDevice(device))" Size="Size.Small" Variant="Variant.Outlined" 
+                               Class="ms-4"
+                               Icon="@Icons.Material.Filled.Delete" Color="Color.Error"/>
             </MudListItem>
         }
     </MudList>
@@ -24,11 +39,27 @@
 
 
 @code {
-    
+
     [Parameter] public TicketCreateDto CreateDto { get; set; } = default!;
-    
-    private async Task RemoveDevice(string deviceInvNumber)
+    private string _errorMsg = string.Empty;
+
+    public async Task ShowDialog()
     {
-        throw new NotImplementedException();
+        var device = await DialogService.ShowDeviceDialog(new DeviceDto(), "Оборудование");
+        if (device is not null) CreateDto.Devices.Add(device);
     }
+
+    private async Task RemoveDevice(DeviceView deviceInvNumber)
+    {
+        try
+        {
+            await DeviceService.RemoveDevice(deviceInvNumber.InvNumber);
+            CreateDto.Devices.Remove(deviceInvNumber);
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
 }

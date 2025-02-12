@@ -22,4 +22,10 @@
       <ProjectReference Include="..\HelpDesk.Services\HelpDesk.Services.csproj" />
       <ProjectReference Include="..\HelpDesk.Storage\HelpDesk.Storage.csproj" />
     </ItemGroup>
+
+
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+      <Folder Include="Modals\Tickets\" />
+    </ItemGroup>
 </Project>

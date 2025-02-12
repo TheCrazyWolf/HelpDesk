@@ -1,0 +1,55 @@
+﻿@using HelpDesk.Models.Dto.Devices
+@using HelpDesk.Models.Enums.Devices
+@using HelpDesk.Models.Enums.Extensions
+@using HelpDesk.Services.Devices
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inject DeviceService DeviceService
+
+<EditForm Model="@DeviceDto" OnValidSubmit="SubmitAsync">
+    <DataAnnotationsValidator/>
+    <MudDialog>
+        <DialogContent>
+            <MudStack Row="true">
+                <MudTextField T="string" @bind-value="DeviceDto.InvNumber" Label="Инвентарный номер"></MudTextField>
+            </MudStack>
+            <MudSelect @bind-Value="DeviceDto.Type"
+                       Label="Приоритет">
+                @foreach (var deviceType in Enum.GetValues(typeof(DeviceType)).Cast<DeviceType>())
+                {
+                    <MudSelectItem Value="@deviceType">@deviceType.GetDisplayName()</MudSelectItem>
+                }
+            </MudSelect>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Dark" OnClick="@Cancel">Закрыть</MudButton>
+            <MudButton Color="Color.Info" OnClick="@SubmitAsync">Сохранить</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public DeviceDto DeviceDto { get; set; } = new();
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            MudDialog.Close(await DeviceService.CreateOrUpdate(DeviceDto));
+        }
+        catch (Exception e)
+        {
+            
+        }
+    }
+
+    private void Cancel(MouseEventArgs arg)
+    {
+        MudDialog.Close();
+    }
+
+}
