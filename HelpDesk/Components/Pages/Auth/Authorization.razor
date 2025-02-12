@@ -3,6 +3,7 @@
 
 @using HelpDesk.Components.Layout
 @using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Utils
 
 @layout AuthorizationLayout
@@ -34,9 +35,17 @@
     }
     else
     {
-        <MudAlert Severity="Severity.Info">
-            Вы авторизованы в системе как: @_deskToken.LastName @_deskToken.FirstName
+        <MudAlert Class="mt-4 " Severity="Severity.Normal">Вы уже авторизованы как:
         </MudAlert>
+        <MudCardHeader Class="ps-0">
+            <CardHeaderAvatar>
+                <MudAvatar Color="Color.Secondary">@_deskToken.LastName.FirstOrDefault()@_deskToken.FirstName.FirstOrDefault()</MudAvatar>
+            </CardHeaderAvatar>
+            <CardHeaderContent>
+                <MudText Typo="Typo.body1">@_deskToken.LastName @_deskToken.FirstName</MudText>
+                <MudText Typo="Typo.body2">@_deskToken.IdentityType.GetDisplayName()</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
     }
     <MudStack Class="mt-4" Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None"
               Justify="Justify.SpaceBetween">
