@@ -23,4 +23,8 @@
       <ProjectReference Include="..\HelpDesk.Models.DLA\HelpDesk.Models.DLA.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+    </ItemGroup>
+
 </Project>
