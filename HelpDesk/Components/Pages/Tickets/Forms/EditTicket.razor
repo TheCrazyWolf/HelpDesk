@@ -1,7 +1,6 @@
 ﻿@page "/tickets/form/{id:long}/"
 
 @using HelpDesk.Models.Dto.Auth
-@using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Services.Tickets
 @using HelpDesk.Utils
 @using HelpDesk.Models.PLA.Tickets
@@ -25,66 +24,7 @@
         <MudPaper Class="mt-2" Elevation="0">
             <MudForm>
                 <AuthorOfTicket Ticket="_ticket"/>
-                <table class="mt-4">
-                    <tr>
-                        <td>
-                            <MudText Class="mb-2">Место:</MudText>
-                        </td>
-                        <td>
-                            <MudText Class="mb-2">@_ticket?.PlaceOfIssue</MudText>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <MudText Class="mb-2">Дата создания:</MudText>
-                        </td>
-                        <td>
-                            <MudText Class="mb-2">@_ticket?.CreatedAt</MudText>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <MudText Class="mb-2">Срок решения:</MudText>
-                        </td>
-                        <td>
-                            <MudText Class="mb-2">@_ticket?.Deadline</MudText>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <MudText Class="mb-2">Тип заявки</MudText>
-                        </td>
-                        <td>
-                            <MudText Class="mb-2">@_ticket?.Type.GetDisplayName()</MudText>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <MudText Class="mb-2">Приоритет:</MudText>
-                        </td>
-                        <td>
-                            <MudText Class="mb-2">@_ticket?.Priority.GetDisplayName()</MudText>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <MudText Class="mb-2">Последнее обновления заявки:</MudText>
-                        </td>
-                        <td>
-                            <MudText Class="mb-2">@_ticket?.UpdatedAt</MudText>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <MudText Class="mb-2">Исполнители:</MudText>
-                        </td>
-                        <td>
-                            <MudText Class="mb-2">@_ticket?.UpdatedAt</MudText>
-                        </td>
-                    </tr>
-                </table>
-                <MudTextField T="string" Label="Тема"/>
-                <MudTextField T="string" Lines="6" Label="Подробное описание"/>
+                <DetailsOfTicket Ticket="_ticket" _deskToken="_deskToken"/>
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">

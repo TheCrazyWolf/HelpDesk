@@ -15,7 +15,7 @@ public class Ticket : DlaEntity
     public TicketLevelPriority Priority { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? Deadline { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
     public long? UserId { get; set; }
     [ForeignKey("UserId")] public Account? User { get; set; }
 }

@@ -1,0 +1,166 @@
+﻿@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Enums.Extensions
+@using HelpDesk.Models.Enums.Identity
+@using HelpDesk.Models.PLA.Accounts
+@using HelpDesk.Models.PLA.Tickets
+@using HelpDesk.Services.Identity
+
+@inject IdentityService IdentityService
+
+<table class="mt-4">
+    <tr>
+        <td>
+            <MudText>Место:</MudText>
+        </td>
+        <td>
+            <MudText>@Ticket?.PlaceOfIssue</MudText>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <MudText>Дата создания:</MudText>
+        </td>
+        <td>
+            <MudText>@Ticket?.CreatedAt</MudText>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <MudText>Срок решения:</MudText>
+        </td>
+        <td>
+            <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
+                <MudText>@(Ticket?.Deadline is null ? "Не назначено" : Ticket?.Deadline)</MudText>
+                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                {
+                    <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
+                                   aria-label="delete"/>
+                }
+            </MudStack>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <MudText>Статус:</MudText>
+        </td>
+        <td>
+            <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
+                <MudText>@Ticket?.Status.GetDisplayName()</MudText>
+                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                {
+                    <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
+                                   aria-label="delete"/>
+                }
+            </MudStack>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <MudText>Тип заявки</MudText>
+        </td>
+        <td>
+            <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
+                <MudText>@Ticket?.Type.GetDisplayName()</MudText>
+                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                {
+                    <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
+                                   aria-label="delete"/>
+                }
+            </MudStack>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <MudText>Приоритет:</MudText>
+        </td>
+        <td>
+            <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
+                <MudText>@Ticket?.Priority.GetDisplayName()</MudText>
+                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                {
+                    <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
+                                   aria-label="delete"/>
+                }
+            </MudStack>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <MudText>Последнее обновления заявки:</MudText>
+        </td>
+        <td>
+            <MudText>@Ticket?.UpdatedAt</MudText>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <MudText Class="mb-2">Исполнители:</MudText>
+        </td>
+        <td>
+            <MudStack Row="true" Spacing="0" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center"
+                      StretchItems="StretchItems.None">
+                @foreach (var executor in _executors)
+                {
+                    if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Class="ms-0" OnClose="() 
+                                     => Remove(executor)">@executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Size="Size.Small" Class="ms-0"
+                                 Color="Color.Default">@executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
+                        </MudChip>
+                    }
+                }
+                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                {
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Add"/>
+                }
+            </MudStack>
+        </td>
+    </tr>
+</table>
+
+@code {
+
+    [Parameter] public TicketView? Ticket { get; set; } = default!;
+    [Parameter] public DeskToken? _deskToken { get; set; } = default!;
+
+    private IList<TicketExecutorView> _executors = new List<TicketExecutorView>()
+    {
+        new TicketExecutorView()
+        {
+            Identity = new IdentityView()
+            {
+                FirstName = "Алексей", LastName = "Кулагин"
+            }
+        },
+        new TicketExecutorView()
+        {
+            Identity = new IdentityView()
+            {
+                FirstName = "Алексей", LastName = "Кулагин"
+            }
+        },
+        new TicketExecutorView()
+        {
+            Identity = new IdentityView()
+            {
+                FirstName = "Алексей", LastName = "Кулагин"
+            }
+        }
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task Remove(TicketExecutorView executor)
+    {
+        throw new NotImplementedException();
+    }
+
+}
