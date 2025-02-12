@@ -94,7 +94,7 @@
     </tr>
     <tr>
         <td>
-            <MudText Class="mb-2">Исполнители:</MudText>
+            <MudText >Исполнители:</MudText>
         </td>
         <td>
             <MudStack Row="true" Spacing="0" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center"
@@ -114,6 +114,10 @@
                         </MudChip>
                     }
                 }
+                @if (_executors.Count is 0)
+                {
+                    <MudText>Не назначено</MudText>
+                }
                 @if (_deskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Add"/>
@@ -128,30 +132,7 @@
     [Parameter] public TicketView? Ticket { get; set; } = default!;
     [Parameter] public DeskToken? _deskToken { get; set; } = default!;
 
-    private IList<TicketExecutorView> _executors = new List<TicketExecutorView>()
-    {
-        new TicketExecutorView()
-        {
-            Identity = new IdentityView()
-            {
-                FirstName = "Алексей", LastName = "Кулагин"
-            }
-        },
-        new TicketExecutorView()
-        {
-            Identity = new IdentityView()
-            {
-                FirstName = "Алексей", LastName = "Кулагин"
-            }
-        },
-        new TicketExecutorView()
-        {
-            Identity = new IdentityView()
-            {
-                FirstName = "Алексей", LastName = "Кулагин"
-            }
-        }
-    };
+    private IList<TicketExecutorView> _executors = new List<TicketExecutorView>();
 
     protected override async Task OnParametersSetAsync()
     {
