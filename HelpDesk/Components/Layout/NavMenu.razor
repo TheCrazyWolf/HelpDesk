@@ -1,6 +1,7 @@
 ﻿@using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Utils
+
 @inject StorageSession Session
 @inject NavigationManager Navigation
 
@@ -21,7 +22,7 @@
                 </CardHeaderActions>
             </MudCardHeader>
         }
-        <MudNavLink Href="/index" Icon="@Icons.Material.Filled.Home">Мои заявки</MudNavLink>
+        <MudNavLink Href="/" Icon="@Icons.Material.Filled.Book">Мои заявки</MudNavLink>
         <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.Science">Админ панель</MudNavLink>
     </MudNavMenu>
 </MudPaper>

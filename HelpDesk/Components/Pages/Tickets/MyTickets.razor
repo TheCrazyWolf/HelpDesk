@@ -1,9 +1,76 @@
 ﻿@page "/"
 @page "/tickets/me"
+@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Enums.Extensions
+@using HelpDesk.Models.PLA.Tickets
+@using HelpDesk.Services.Tickets
+@using HelpDesk.Utils
 
+@inject TicketService TicketService
+@inject StorageSession Session
 
-<h3>Мои заявки</h3>
+<MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">Мои заявки</MudText>
+
+<MudStack Class="mt-4" Row="true" Spacing="0">
+    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create" Color="Color.Primary">Создать новую заявку</MudButton>
+</MudStack>
+
+@if (_tickets is not null)
+{
+    <MudDataGrid Class="mt-4" Elevation="0" T="TicketView" Items="@_tickets">
+        <Columns>
+            <PropertyColumn Property="x => x.Id" Title="Номер"/>
+            <PropertyColumn Property="x => x.CreatedAt" Title="Дата создания"/>
+            <PropertyColumn Property="x => x.Title" Title="Тема"/>
+            <PropertyColumn Property="x => x.Status" Title="Статус">
+                <CellTemplate>
+                    @context.Item.Status.GetDisplayName()
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Deadline" Title="Срок завершения"/>
+            <TemplateColumn >
+                <CellTemplate>
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Face"
+                               Color="Color.Primary">
+                        Перейти к карточку
+                    </MudButton>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+else
+{
+    <MudProgressCircular Class="mt-4" Color="Color.Primary" Indeterminate="true"/>
+}
+
 
 @code {
-    
+
+    private DeskToken? _deskToken;
+
+    private IEnumerable<TicketView>? _tickets;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _deskToken = await Session.GetCurrentAccessToken();
+        if (_deskToken is null) return;
+        await LoadTickets();
+    }
+
+
+    public async Task LoadTickets()
+    {
+        try
+        {
+            _tickets = await TicketService.ShowTicketsByAccountId(_deskToken!.Id);
+        }
+        catch (Exception e)
+        {
+            // show window
+        }
+    }
+
 }

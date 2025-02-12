@@ -66,4 +66,13 @@ public class TicketService(HelpDeskContext ef, DocumentService documentService, 
         ef.Update(ticket);
         await ef.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<TicketView>?> ShowTicketsByAccountId(long id)
+    {
+        var tickets = await ef.Tickets.Where(x => x.UserId == id)
+            .OrderByDescending(x=> x.CreatedAt)
+            .ToListAsync();
+        
+        return mapper.Map<IEnumerable<TicketView>>(tickets);
+    }
 }
