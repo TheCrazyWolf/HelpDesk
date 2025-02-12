@@ -77,7 +77,7 @@
     {
         try
         {
-            await DocumentService.RemoveFile(DeskToken!.Id);
+            await DocumentService.RemoveFile(file.Id);
             CreateDto.Files.Remove(file);
         }
         catch (Exception e)
