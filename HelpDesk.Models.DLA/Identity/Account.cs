@@ -14,4 +14,5 @@ public class Account : DlaEntity
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public IdentityType IdentityType { get; set; }
+    public bool IsMfcIntegration { get; set; }
 }

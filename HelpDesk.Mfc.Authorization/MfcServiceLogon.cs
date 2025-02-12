@@ -7,7 +7,7 @@ namespace HelpDesk.Mfc.Authorization;
 
 public class MfcServiceLogon
 {
-    private RestClient _restClient = new RestClient("https://mfc.samgk.ru/");
+    private readonly RestClient _restClient = new RestClient("https://mfc.samgk.ru/");
 
     public async Task<AuthMfcResult?> Login(LoginParams loginParams)
     {

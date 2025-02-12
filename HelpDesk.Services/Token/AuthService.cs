@@ -14,6 +14,8 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
 {
     public async Task<DeskToken?> AuthenticateUser(LoginParams loginParams)
     {
+        loginParams.Username = loginParams.Username.ToLower();
+        loginParams.Password = loginParams.Password.ToLower();
         var user = await ef.Accounts.FirstOrDefaultAsync(x=> x.Password == loginParams.Password.GetHash() 
                                                              && x.Login == loginParams.Username);
 
@@ -26,8 +28,8 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
         }
         
         var result = await mfcServiceLogon.Login(loginParams);
-        if(result is null || result.Code is "404") throw new Exception("Неверный логин или пароль.");
-        
+        if(result is null) throw new Exception("Не удалось установить связь с mfc.samgk.ru. Попробуйте позднее.");
+        if(result.Code is "404") throw new Exception("Неверный логин или пароль");
         return await CreateAndGetToken(loginParams, result);
     }
 
@@ -39,8 +41,9 @@ public class AuthService(HelpDeskContext ef, MfcServiceLogon mfcServiceLogon, IM
             Password = loginParams.Password.GetHash(),
             FirstName = mfcResult.Name,
             LastName = mfcResult.Surname,
-            MiddleName = mfcResult.Name,
-            IdentityType = mfcResult.IsTeacher ? IdentityType.Teacher : IdentityType.Student,
+            MiddleName = mfcResult.Patronymic,
+            IdentityType = mfcResult.IsTeacher ? IdentityType.Employee : IdentityType.Student,
+            IsMfcIntegration = true
         };
         
         await ef.AddAsync(user);

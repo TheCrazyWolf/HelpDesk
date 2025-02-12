@@ -12,8 +12,9 @@ public class TicketExecutor : DlaEntity
     public long? TicketId { get; set; }
     [ForeignKey("TicketId")] public Ticket? Ticket { get; set; } = new Ticket();
 
-    public DateTime AppointedAt { get; set; }
+    public DateTime AppointedAt { get; set; } = DateTime.Now;
 
     public long? AppointedWhoId { get; set; }
     [ForeignKey("AppointedWhoId")] public Account? AppointedWho { get; set; }
+    
 }

@@ -5,65 +5,69 @@
 @using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Utils
 
-@layout AuthrizationLayout
+@layout AuthorizationLayout
 @inject StorageSession Session
 @inject NavigationManager Navigation
 
-<PageTitle>HelpDesk: Вход в систему</PageTitle>
-
 <EditForm Model="@_loginFormParams" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator/>
-    <MudCard Style="padding: 15px;" Class="p-5">
-        <MudText Typo="Typo.h6">Вход в систему</MudText>
+    @if (_deskToken is null)
+    {
+        <MudAlert Class="mt-4 " Severity="Severity.Normal">Используйте для входа учётные данные от личного
+            кабинета преподавателя (mfc.samgk.ru)
+        </MudAlert>
         @if (!string.IsNullOrEmpty(_stringErrorMessage))
         {
             <MudAlert Severity="Severity.Error"
+                      Class="mt-2"
                       ShowCloseIcon="true" CloseIconClicked="(() => _stringErrorMessage = string.Empty)">
                 @_stringErrorMessage
             </MudAlert>
         }
+        <MudTextField Class="mt-4" Label="Логин"
+                      Disabled="_isBusy"
+                      @bind-Value="_loginFormParams.Username" For="@(() => _loginFormParams.Username)"/>
+        <MudTextField Label="Пароль" Style="padding-left: 0;"
+                      Disabled="_isBusy"
+                      InputType="InputType.Password" @bind-Value="_loginFormParams.Password"
+                      For="@(() => _loginFormParams.Password)"/>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info">
+            Вы авторизованы в системе как: @_deskToken.LastName @_deskToken.FirstName
+        </MudAlert>
+    }
+    <MudStack Class="mt-4" Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None"
+              Justify="Justify.SpaceBetween">
         @if (_deskToken is null)
         {
-            <MudAlert Class="mt-4 mb-4" Severity="Severity.Info">Используйте для входа учётные данные от личного кабинета преподавателя (mfc.samgk.ru)</MudAlert>
-            <MudTextField Class="mt-4" Label="Логин"
-                          @bind-Value="_loginFormParams.Username" For="@(() => _loginFormParams.Username)"/>
-            <MudTextField Label="Пароль"
-                          InputType="InputType.Password" @bind-Value="_loginFormParams.Password" For="@(() => _loginFormParams.Password)"/>
-            <MudCheckBox @bind-Value="_loginFormParams.IsRememberMe" For="@(() => _loginFormParams.IsRememberMe)" Label="Запомнить меня"></MudCheckBox>
+            <MudCheckBox @bind-Value="_loginFormParams.IsRememberMe" For="@(() => _loginFormParams.IsRememberMe)"
+                         Class="me-2"
+                         Disabled="_isBusy"
+                         Label="Запомнить меня"></MudCheckBox>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
+                       DropShadow="false"
+                       Disabled="_isBusy"
+                       Color="Color.Primary">
+                Авторизоваться
+            </MudButton>
         }
         else
         {
-            <MudAlert Severity="Severity.Info">
-                Вы авторизованы в системе как: @_deskToken.LastName @_deskToken.FirstName
-            </MudAlert>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
+                       DropShadow="false" Href="/"
+                       Color="Color.Primary">
+                Вернутся
+            </MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
+                       DropShadow="false"
+                       OnClick="() => ClearSession()"
+                       Color="Color.Primary">
+                Выйти
+            </MudButton>
         }
-        <MudCardActions>
-            @if (_deskToken is null)
-            {
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
-                           DropShadow="false"
-                           Color="Color.Primary" >
-                    Авторизоваться
-                </MudButton>
-            }
-            else
-            {
-                <MudStack Row="true" Spacing="0" Justify="Justify.FlexStart">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
-                               DropShadow="false" Href="/" Class="me-2"
-                               Color="Color.Primary" >
-                        Вернутся
-                    </MudButton>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined"
-                               DropShadow="false"
-                               OnClick="() => ClearSession()"
-                               Color="Color.Primary" >
-                        Выйти
-                    </MudButton>
-                </MudStack>
-            }
-        </MudCardActions>
-    </MudCard>
+    </MudStack>
 </EditForm>
 
 @code {
@@ -71,9 +75,11 @@
     private readonly LoginParams _loginFormParams = new();
     private string _stringErrorMessage = string.Empty;
     private DeskToken? _deskToken;
+    private bool _isBusy = false;
 
     private async Task OnValidSubmit(EditContext arg)
     {
+        _isBusy = true;
         try
         {
             await Session.Login(_loginFormParams);
@@ -83,6 +89,8 @@
         {
             _stringErrorMessage = e.Message;
         }
+
+        _isBusy = false;
     }
 
     protected override async Task OnInitializedAsync()

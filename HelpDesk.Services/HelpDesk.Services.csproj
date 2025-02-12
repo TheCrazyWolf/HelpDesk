@@ -18,4 +18,8 @@
       <PackageReference Include="Utilities.AesEncryptor" Version="8.0.945" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Devices\" />
+    </ItemGroup>
+
 </Project>
