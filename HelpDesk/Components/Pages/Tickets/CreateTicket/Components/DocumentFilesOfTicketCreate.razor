@@ -1,20 +1,40 @@
-﻿@using HelpDesk.Models.Dto.Tickets.Tickets
+﻿@using BlazorDownloadFile
+@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Dto.Tickets.Tickets
 @using HelpDesk.Models.PLA.Devices
+@using HelpDesk.Models.PLA.Documents
+@using HelpDesk.Services.Documents
+
+@inject DocumentService DocumentService
+@inject IBlazorDownloadFileService BlazorDownloadFileService
+
 <MudText Class="mb-0">Документы/файлы</MudText>
 <MudForm>
     <MudStack Class="mt-4" Row="true" Spacing="0">
-        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create"
-                   Size="Size.Small"
-                   Color="Color.Primary">
-            Загрузить файл
-        </MudButton>
+        <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles!">
+            <ActivatorContent>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create"
+                           Size="Size.Small"
+                           Color="Color.Primary">
+                    Загрузить файл
+                </MudButton>
+            </ActivatorContent>
+        </MudFileUpload>
     </MudStack>
     <MudList Class="mt-2" T="DeviceView">
+        @if (!string.IsNullOrEmpty(_errorMsg))
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+                @_errorMsg
+            </MudAlert>
+        }
         @foreach (var file in CreateDto.Files)
         {
-            <MudListItem Icon="@Icons.Material.Filled.AttachFile">
+            <MudListItem OnClick="() => DownloadFile(file)" Icon="@Icons.Material.Filled.AttachFile">
                 <code>@file.FileName </code>
-                <MudIconButton OnClick="@(() => DownloadFile(file.Id))" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Delete" Color="Color.Error"/>
+                <MudIconButton Class="ms-4" OnClick="@(() => RemoveFile(file))" 
+                               Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Delete" 
+                               Color="Color.Error"/>
             </MudListItem>
         }
     </MudList>
@@ -24,10 +44,46 @@
 @code {
 
     [Parameter] public TicketCreateDto CreateDto { get; set; } = default!;
+    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
+    
+    private string _errorMsg = string.Empty;
 
-    private Task DownloadFile(object id)
+    private async Task DownloadFile(DeskDocumentView fileId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var stream = await DocumentService.DownloadFileAsync(fileId.Id);
+            await BlazorDownloadFileService.DownloadFile(fileId.FileName, stream.ToArray(), "application/octet-stream");
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private async Task UploadFiles(IReadOnlyList<IBrowserFile> arg)
+    {
+        try
+        {
+            foreach (var file in arg) CreateDto.Files.Add(await DocumentService.UploadFile(file, DeskToken!.Id));
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private async Task RemoveFile(DeskDocumentView file)
+    {
+        try
+        {
+            await DocumentService.RemoveFile(DeskToken!.Id);
+            CreateDto.Files.Remove(file);
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
     }
 
 }

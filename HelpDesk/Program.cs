@@ -1,5 +1,6 @@
 using Aes.Encryptor.Interfaces;
 using Aes.Encryptor.Services;
+using BlazorDownloadFile;
 using Blazored.LocalStorage;
 using MudBlazor.Services;
 using HelpDesk.Components;
@@ -30,6 +31,7 @@ builder.Services.AddSingleton<IMapper, Mapper>();
 builder.Services.AddSingleton<TokenEncryptionService>(s =>
     new TokenEncryptionService("12345678901234567890123456789012", s.GetRequiredService<IAesService>()));
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazorDownloadFile();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

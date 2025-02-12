@@ -1,7 +1,9 @@
-﻿using HelpDesk.Models.DLA.Tickets;
+﻿using HelpDesk.Models.DLA.Documents;
+using HelpDesk.Models.DLA.Tickets;
 using HelpDesk.Models.PLA.Documents;
 using HelpDesk.Storage;
 using MapsterMapper;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Services.Documents;
@@ -59,5 +61,55 @@ public class DocumentService(HelpDeskContext ef, IMapper mapper)
             ef.Update(document);
         }
         await ef.SaveChangesAsync();
+    }
+
+    public async Task<DeskDocumentView> UploadFile(IBrowserFile file, long ownerFileId)
+    {
+        var userId = ownerFileId;
+        var filesDirectory = Path.Combine(Directory.GetCurrentDirectory(), "files");
+        if (!Directory.Exists(filesDirectory)) Directory.CreateDirectory(filesDirectory);
+        var userDirectory = Path.Combine(filesDirectory, userId.ToString());
+        if (!Directory.Exists(userDirectory)) Directory.CreateDirectory(userDirectory);
+        var filePath = Path.Combine(userDirectory, file.Name);
+        await using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+        await file.OpenReadStream().CopyToAsync(fileStream);
+        var entityFile = new DeskDocument { UserId = userId, Path = filePath, FileName = file.Name, UploadedAt = DateTime.Now };
+        await AddFileAsync(entityFile);
+        return mapper.Map<DeskDocumentView>(entityFile);
+    }
+
+    public async Task<DeskDocument?> GetDocumentById(long id)
+    {
+        return await ef.Documents.FirstOrDefaultAsync(x=> x.Id == id);
+    }
+    public async Task<MemoryStream> DownloadFileAsync(long fileId)
+    {
+        var file = await GetDocumentById(fileId);
+        if (file is null) throw new Exception("Файл не найден");
+        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), file.Path);
+        var memory = new MemoryStream();
+        await using var stream = new FileStream(fullPath, FileMode.Open);
+        await stream.CopyToAsync(memory);
+        return memory;
+    }
+
+    private async Task AddFileAsync(DeskDocument entityFile)
+    {
+        await ef.AddAsync(entityFile);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task RemoveFile(long fileId)
+    {
+        var file = await GetDocumentById(fileId);
+        if (file is null) throw new Exception("Файл не найден");
+        if(await IsUsedDocument(file.Id)) throw new Exception("Документ используется в документах ");
+        ef.Remove(file);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsUsedDocument(long documentId)
+    {
+        return await ef.Documents.AnyAsync(x=> x.TicketHistoryId  != null || x.TicketId != null);
     }
 }
