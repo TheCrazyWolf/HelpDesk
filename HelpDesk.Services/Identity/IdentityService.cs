@@ -21,7 +21,7 @@ public class IdentityService(HelpDeskContext ef, IMapper mapper)
             .ToListAsync());
     }
     
-    public async Task<IdentityView?> GetIdentityView(long id)
+    public async Task<IdentityView?> GetIdentityView(long? id)
     {
         var identity = await ef.Accounts.FirstOrDefaultAsync(x => x.Id == id);
         return identity is not null ? mapper.Map<IdentityView>(identity) : null;

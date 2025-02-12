@@ -1,0 +1,30 @@
+﻿@using HelpDesk.Models.Dto.Identity
+@using HelpDesk.Models.PLA.Accounts
+@using HelpDesk.Models.PLA.Tickets
+@using HelpDesk.Services.Identity
+
+@inject IdentityService IdentityService
+
+<MudText Class="mt-2 mb-4">
+    Автор заявки:
+</MudText>
+<MudChat ChatPosition="ChatBubblePosition.Start">
+    <MudAvatar>@IdentityView?.LastName.FirstOrDefault()@IdentityView?.FirstName.FirstOrDefault()</MudAvatar>
+    <MudChatHeader Name="@($"{IdentityView?.LastName} {IdentityView?.FirstName} {IdentityView?.MiddleName}")"/>
+    <MudChatBubble>
+        @Ticket?.Description
+    </MudChatBubble>
+</MudChat>
+
+@code {
+    
+    [Parameter] public TicketView? Ticket { get; set; } = default!;
+    private IdentityView? IdentityView;
+    private IdentityUpdateContact
+    protected override async Task OnParametersSetAsync()
+    {
+       await base.OnParametersSetAsync();
+       IdentityView = await IdentityService.GetIdentityView(Ticket?.UserId);
+    }
+
+}
