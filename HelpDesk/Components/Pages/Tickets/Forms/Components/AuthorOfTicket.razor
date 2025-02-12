@@ -1,5 +1,4 @@
-﻿@using HelpDesk.Models.Dto.Identity
-@using HelpDesk.Models.PLA.Accounts
+﻿@using HelpDesk.Models.PLA.Accounts
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Identity
 
@@ -20,7 +19,7 @@
     
     [Parameter] public TicketView? Ticket { get; set; } = default!;
     private IdentityView? IdentityView;
-    private IdentityUpdateContact
+
     protected override async Task OnParametersSetAsync()
     {
        await base.OnParametersSetAsync();
