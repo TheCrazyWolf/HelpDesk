@@ -1,7 +1,40 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
+﻿@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Enums.Extensions
+@using HelpDesk.Utils
+@inject StorageSession Session
+@inject NavigationManager Navigation
 
-    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Weather</MudNavLink>
+<MudPaper Width="300px" Elevation="0">
+    <MudNavMenu Rounded="true" Margin="Margin.Dense" Class="pa-2">
+        @if (_deskToken is not null)
+        {
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Color="Color.Secondary">@_deskToken.LastName.FirstOrDefault()@_deskToken.FirstName.FirstOrDefault()</MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.body1">@_deskToken.LastName @_deskToken.FirstName</MudText>
+                    <MudText Typo="Typo.body2">@_deskToken.IdentityType.GetDisplayName()</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default"/>
+                </CardHeaderActions>
+            </MudCardHeader>
+        }
+        <MudNavLink Href="/index" Icon="@Icons.Material.Filled.Home">Мои заявки</MudNavLink>
+        <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.Science">Админ панель</MudNavLink>
+    </MudNavMenu>
+</MudPaper>
 
-</MudNavMenu>
+@code {
+
+    private DeskToken? _deskToken;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _deskToken = await Session.GetCurrentAccessToken();
+        if (_deskToken is null || !_deskToken.IsValid()) Navigation.NavigateTo("/auth/login");
+    }
+
+}

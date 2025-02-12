@@ -1,29 +1,28 @@
-﻿@using HelpDesk.Models.Dto.Auth
-@using HelpDesk.Utils
-@inherits LayoutComponentBase
-@inject StorageSession Session
-@inject NavigationManager Navigation
+﻿@inherits LayoutComponentBase
+
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+
+<MudLayout >
+    <MudAppBar Elevation="0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        <MudText Typo="Typo.subtitle1" Color="Color.Dark" Class="ml-3">HelpDesk: Самарский государственный колледж</MudText>
         <MudSpacer/>
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
     </MudAppBar>
-    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+    <MudDrawer @bind-Open="_drawerOpen"
+               Width="300px"
+               ClipMode="DrawerClipMode.Always" Elevation="0">
         <NavMenu/>
     </MudDrawer>
-    <MudMainContent Class="mt-16 pa-4">
-        @Body
+    <MudMainContent>
+        <MudPaper Elevation="4" Style="overflow-y: scroll; padding: 15px; margin: 10px 20px 10px 20px; height: 88vh;">
+            @Body
+        </MudPaper>
     </MudMainContent>
 </MudLayout>
-
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -33,16 +32,12 @@
 
 @code {
     private bool _drawerOpen = true;
-    private bool _isDarkMode = true;
+    private bool _isDarkMode = false;
     private MudTheme? _theme = null;
-    private DeskToken? _deskToken;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _deskToken = await Session.GetCurrentAccessToken();
-        if(_deskToken is null || !_deskToken.IsValid()) Navigation.NavigateTo("/auth/login");
-        
         _theme = new()
         {
             PaletteLight = _lightPalette,
