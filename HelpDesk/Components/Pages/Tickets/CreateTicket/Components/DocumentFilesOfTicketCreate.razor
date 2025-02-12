@@ -1,0 +1,33 @@
+﻿@using HelpDesk.Models.Dto.Tickets.Tickets
+@using HelpDesk.Models.PLA.Devices
+<MudText Class="mb-0">Документы/файлы</MudText>
+<MudForm>
+    <MudStack Class="mt-4" Row="true" Spacing="0">
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create"
+                   Size="Size.Small"
+                   Color="Color.Primary">
+            Загрузить файл
+        </MudButton>
+    </MudStack>
+    <MudList Class="mt-2" T="DeviceView">
+        @foreach (var file in CreateDto.Files)
+        {
+            <MudListItem Icon="@Icons.Material.Filled.AttachFile">
+                <code>@file.FileName </code>
+                <MudIconButton OnClick="@(() => DownloadFile(file.Id))" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Delete" Color="Color.Error"/>
+            </MudListItem>
+        }
+    </MudList>
+</MudForm>
+
+
+@code {
+
+    [Parameter] public TicketCreateDto CreateDto { get; set; } = default!;
+
+    private Task DownloadFile(object id)
+    {
+        throw new NotImplementedException();
+    }
+
+}

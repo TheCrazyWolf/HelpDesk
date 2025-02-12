@@ -23,7 +23,7 @@ public class TicketService(HelpDeskContext ef, DocumentService documentService, 
         var ticketEntity = mapper.Map<Ticket>(ticket);
         await ef.AddAsync(ticketEntity);
         await ef.SaveChangesAsync();
-        await documentService.AttachDocumentToTicket(ticketEntity, ticket.DocumentsIds);
+        await documentService.AttachDocumentToTicket(ticketEntity, ticket.Files.Select(x=> x.Id).ToArray());
         return ticketEntity.Id;
     }
 

@@ -9,6 +9,7 @@ public class Ticket : DlaEntity
 {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public string PlaceOfIssue { get; set; } = string.Empty;
     public TicketType Type { get; set; }
     public TicketStatus Status { get; set; }
     public TicketLevelPriority Priority { get; set; }
