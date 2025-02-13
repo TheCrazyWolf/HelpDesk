@@ -2,7 +2,6 @@
 @using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Models.Enums.Identity
-@using HelpDesk.Models.PLA.Accounts
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Identity
 
@@ -84,6 +83,7 @@
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
+                                   OnClick="() => DialogService.ShowUpdatePriority(Ticket!.Id)"
                                    aria-label="delete"/>
                 }
             </MudStack>

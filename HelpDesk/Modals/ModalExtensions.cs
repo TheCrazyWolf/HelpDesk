@@ -38,4 +38,11 @@ public static class ModalExtensions
         var dialog = await dialogService.ShowAsync<TicketEditType>(title, parameters);
         await dialog.Result;
     }
+    
+    public static async Task ShowUpdatePriority(this IDialogService dialogService, long ticketId, string title = "Новый приоритет заявки")
+    {
+        var parameters = new DialogParameters<TicketEditPriority> { { "IdTicket", ticketId } };
+        var dialog = await dialogService.ShowAsync<TicketEditPriority>(title, parameters);
+        await dialog.Result;
+    }
 }
