@@ -1,4 +1,5 @@
-﻿@using HelpDesk.Models.Dto.Auth
+﻿@using HelpDesk.Modals
+@using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Models.Enums.Identity
 @using HelpDesk.Models.PLA.Accounts
@@ -6,6 +7,7 @@
 @using HelpDesk.Services.Identity
 
 @inject IdentityService IdentityService
+@inject IDialogService DialogService
 
 <table class="mt-4">
     <tr>
@@ -31,9 +33,10 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText>@(Ticket?.Deadline is null ? "Не назначено" : Ticket?.Deadline)</MudText>
-                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
+                                   OnClick="() => DialogService.ShowUpdateDeadline(Ticket!.Id)"
                                    aria-label="delete"/>
                 }
             </MudStack>
@@ -46,7 +49,7 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText>@Ticket?.Status.GetDisplayName()</MudText>
-                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
                                    aria-label="delete"/>
@@ -61,7 +64,7 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText>@Ticket?.Type.GetDisplayName()</MudText>
-                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
                                    aria-label="delete"/>
@@ -76,7 +79,7 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText>@Ticket?.Priority.GetDisplayName()</MudText>
-                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
                                    aria-label="delete"/>
@@ -101,7 +104,7 @@
                       StretchItems="StretchItems.None">
                 @foreach (var executor in _executors)
                 {
-                    if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                    if (DeskToken?.IdentityType == IdentityType.TechSupport)
                     {
                         <MudChip T="string" Size="Size.Small" Color="Color.Default" Class="ms-0" OnClose="() 
                                      => Remove(executor)">@executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
@@ -118,7 +121,7 @@
                 {
                     <MudText>Не назначено</MudText>
                 }
-                @if (_deskToken?.IdentityType == IdentityType.TechSupport)
+                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Add"/>
                 }
@@ -130,7 +133,7 @@
 @code {
 
     [Parameter] public TicketView? Ticket { get; set; } = default!;
-    [Parameter] public DeskToken? _deskToken { get; set; } = default!;
+    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
 
     private IList<TicketExecutorView> _executors = new List<TicketExecutorView>();
 
