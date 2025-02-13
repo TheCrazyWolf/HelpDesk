@@ -7,6 +7,7 @@
 
 @inject IdentityService IdentityService
 @inject IDialogService DialogService
+@inject NavigationManager Navigation
 
 <table class="mt-4">
     <tr>
@@ -35,7 +36,7 @@
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="() => DialogService.ShowUpdateDeadline(Ticket!.Id)"
+                                   OnClick="ShowModalDeadLine"
                                    aria-label="delete"/>
                 }
             </MudStack>
@@ -51,7 +52,7 @@
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="() => DialogService.ShowUpdateStatus(Ticket!.Id)"
+                                   OnClick="ShowModalStatus"
                                    aria-label="delete"/>
                 }
             </MudStack>
@@ -67,7 +68,7 @@
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="() => DialogService.ShowUpdateType(Ticket!.Id)"
+                                   OnClick="ShowModalType"
                                    aria-label="delete"/>
                 }
             </MudStack>
@@ -83,7 +84,7 @@
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="() => DialogService.ShowUpdatePriority(Ticket!.Id)"
+                                   OnClick="ShowModalPriority"
                                    aria-label="delete"/>
                 }
             </MudStack>
@@ -108,14 +109,15 @@
                 {
                     if (DeskToken?.IdentityType == IdentityType.TechSupport)
                     {
-                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Class="ms-0" OnClose="() 
-                                     => Remove(executor)">@executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Class="ms-0" OnClose="() => Remove(executor)">
+                            @executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
                         </MudChip>
                     }
                     else
                     {
                         <MudChip T="string" Size="Size.Small" Class="ms-0"
-                                 Color="Color.Default">@executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
+                                 Color="Color.Default">
+                            @executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
                         </MudChip>
                     }
                 }
@@ -136,12 +138,20 @@
 
     [Parameter] public TicketView? Ticket { get; set; } = default!;
     [Parameter] public DeskToken? DeskToken { get; set; } = default!;
-
+    [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
+    
     private IList<TicketExecutorView> _executors = new List<TicketExecutorView>();
 
-    protected override async Task OnParametersSetAsync()
+    protected override Task OnInitializedAsync()
     {
-        await base.OnParametersSetAsync();
+        LoadTicketDelegate += OnLoadTicketDelegateInvoked;
+        return base.OnInitializedAsync();
+    }
+
+    private Task OnLoadTicketDelegateInvoked()
+    {
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
     private async Task Remove(TicketExecutorView executor)
@@ -149,4 +159,28 @@
         throw new NotImplementedException();
     }
 
+
+    public async Task ShowModalDeadLine()
+    {
+        await DialogService.ShowUpdateDeadline(Ticket!.Id);
+        await LoadTicketDelegate?.Invoke()!;
+    }
+    
+    public async Task ShowModalStatus()
+    {
+        await DialogService.ShowUpdateStatus(Ticket!.Id);
+        await LoadTicketDelegate?.Invoke()!;
+    }
+
+    public async Task ShowModalType()
+    {
+        await DialogService.ShowUpdateType(Ticket!.Id);
+        await LoadTicketDelegate?.Invoke()!;
+    }
+    
+    public async Task ShowModalPriority()
+    {
+        await DialogService.ShowUpdatePriority(Ticket!.Id);
+        await LoadTicketDelegate?.Invoke()!;
+    }
 }

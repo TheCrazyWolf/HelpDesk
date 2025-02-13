@@ -24,7 +24,7 @@
         <MudPaper Class="mt-2" Elevation="0">
             <MudForm>
                 <AuthorOfTicket Ticket="_ticket"/>
-                <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken"/>
+                <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken"  LoadTicketDelegate="_loadTicketDelegate"/>
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
@@ -50,15 +50,18 @@
 
     [Parameter] public long Id { get; set; }
     private string _errorMsg = string.Empty;
-    protected TicketView? _ticket;
+    private TicketView? _ticket;
     private DeskToken? _deskToken;
-
+    public delegate Task LoadTicketDelegate();
+    public LoadTicketDelegate? _loadTicketDelegate;
+    
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         _deskToken = await Session.GetCurrentAccessToken();
         if (_deskToken is null) return;
-        await LoadTickets();
+        _loadTicketDelegate += LoadTicket;
+        await LoadTicket();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -66,11 +69,12 @@
         await base.OnParametersSetAsync();
     }
 
-    public async Task LoadTickets()
+    public async Task LoadTicket()
     {
         try
         {
             _ticket = await TicketService.GetTicket(Id);
+            StateHasChanged();
         }
         catch (Exception e)
         {
