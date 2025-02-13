@@ -1,6 +1,7 @@
 ﻿using HelpDesk.Modals.Devices;
 using HelpDesk.Modals.Tickets;
 using HelpDesk.Models.Dto.Devices;
+using HelpDesk.Models.Dto.Tickets.Tickets;
 using HelpDesk.Models.PLA.Devices;
 using MudBlazor;
 
@@ -21,6 +22,13 @@ public static class ModalExtensions
     {
         var parameters = new DialogParameters<TicketEditDeadline> { { "IdTicket", ticketId } };
         var dialog = await dialogService.ShowAsync<TicketEditDeadline>(title, parameters);
+        await dialog.Result;
+    }
+    
+    public static async Task ShowUpdateStatus(this IDialogService dialogService, long ticketId, string title = "Новый статус заявки")
+    {
+        var parameters = new DialogParameters<TicketUpdateStatus> { { "IdTicket", ticketId } };
+        var dialog = await dialogService.ShowAsync<TicketEditStatus>(title, parameters);
         await dialog.Result;
     }
 }

@@ -78,10 +78,16 @@ public class TicketService(HelpDeskContext ef, DeviceInUseService deviceInUseSer
         return mapper.Map<IEnumerable<TicketView>>(tickets);
     }
 
+#pragma warning disable CS8604 // Possible null reference argument.
     public async Task<TicketUpdateDeadLine> GetDtoUpdateDeadLine(long idTicket)
     {
-#pragma warning disable CS8604 // Possible null reference argument.
         return mapper.Map<TicketUpdateDeadLine>(await ef.Tickets.FirstOrDefaultAsync(x => x.Id == idTicket));
-#pragma warning restore CS8604 // Possible null reference argument.
+
     }
+
+    public async Task<TicketUpdateStatus> GetDtoUpdateStatud(long idTicket)
+    {
+        return mapper.Map<TicketUpdateStatus>(await ef.Tickets.FirstOrDefaultAsync(x => x.Id == idTicket));
+    }
+#pragma warning restore CS8604 // Possible null reference argument.
 }

@@ -52,6 +52,7 @@
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
+                                   OnClick="() => DialogService.ShowUpdateStatus(Ticket!.Id)"
                                    aria-label="delete"/>
                 }
             </MudStack>
