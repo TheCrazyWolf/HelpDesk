@@ -41,7 +41,7 @@ public class DocumentService(HelpDeskContext ef, IMapper mapper)
             var document = await ef.Documents.FirstOrDefaultAsync(x=> x.Id == ticketDocumentId);
             if(document is null) continue;
             document.TicketId = ticketEntityId;
-            ef.Update(document);
+            //ef.Update(document);
         }
         await ef.SaveChangesAsync();
     }

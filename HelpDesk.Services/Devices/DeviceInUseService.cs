@@ -16,7 +16,7 @@ public class DeviceInUseService(HelpDeskContext ef, IMapper mapper)
     {
         foreach (var id in devicesId)
         {
-            var deviceInUser = new DeviceInUseTicket(id.Trim().ToLower(), ticketEntityId);
+            var deviceInUser = new DeviceInUseTicket(id.Trim().ToUpper(), ticketEntityId);
             await ef.AddAsync(deviceInUser);
         }
 
