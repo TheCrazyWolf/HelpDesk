@@ -32,7 +32,7 @@
         </td>
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
-                <MudText>@(Ticket?.Deadline is null ? "Не назначено" : Ticket?.Deadline)</MudText>
+                <MudText>@(Ticket?.Deadline is null ? "Не назначено" : Ticket?.Deadline.Value.ToString("dd.MM.yyyy"))</MudText>
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"

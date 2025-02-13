@@ -31,13 +31,18 @@
                     @context.Item.Status.GetDisplayName()
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.Deadline" Title="Срок завершения"/>
+            <TemplateColumn Title="Срок завершения">
+                <CellTemplate>
+                    @context.Item.Deadline?.Date.ToString("dd.MM.yyyy")
+                </CellTemplate>
+            </TemplateColumn>
             <TemplateColumn >
                 <CellTemplate>
-                    <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Face"
+                    <MudButton Size="Size.Small" 
+                               Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.OpenInBrowser"
                                Href="@($"/tickets/form/{context.Item.Id}")"
                                Color="Color.Primary">
-                        Перейти к карточку
+                        Открыть
                     </MudButton>
                 </CellTemplate>
             </TemplateColumn>
