@@ -89,5 +89,11 @@ public class TicketService(HelpDeskContext ef, DeviceInUseService deviceInUseSer
     {
         return mapper.Map<TicketUpdateStatus>(await ef.Tickets.FirstOrDefaultAsync(x => x.Id == idTicket));
     }
+    
+    public async Task<TicketUpdateType> GetDtoUpdateType(long idTicket)
+    {
+        return mapper.Map<TicketUpdateType>(await ef.Tickets.FirstOrDefaultAsync(x => x.Id == idTicket));
+    }
+    
 #pragma warning restore CS8604 // Possible null reference argument.
 }
