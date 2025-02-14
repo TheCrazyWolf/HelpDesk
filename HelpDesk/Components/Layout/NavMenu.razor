@@ -1,6 +1,7 @@
 ﻿@using HelpDesk.Modals
 @using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Enums.Extensions
+@using HelpDesk.Models.Enums.Identity
 @using HelpDesk.Utils
 
 @inject StorageSession Session
@@ -8,39 +9,51 @@
 @inject IDialogService DialogService
 
 <MudPaper Width="300px" Elevation="0">
-    <MudNavMenu Rounded="true" Margin="Margin.Dense" Class="pa-2">
-        @if (_deskToken is not null)
+    <MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Info" Class="pa-2">
+        @if (Session.DeskToken is not null)
         {
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudAvatar Color="Color.Secondary">@_deskToken.LastName.FirstOrDefault()@_deskToken.FirstName.FirstOrDefault()</MudAvatar>
+                    <MudAvatar
+                        Color="Color.Secondary">@Session.DeskToken.LastName.FirstOrDefault()@Session.DeskToken.FirstName.FirstOrDefault()</MudAvatar>
                 </CardHeaderAvatar>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.body1">@_deskToken.LastName @_deskToken.FirstName</MudText>
-                    <MudText Typo="Typo.body2">@_deskToken.IdentityType.GetDisplayName()</MudText>
+                    <MudText Typo="Typo.body1">@Session.DeskToken.LastName @Session.DeskToken.FirstName</MudText>
+                    <MudText Typo="Typo.body2">@Session.DeskToken.IdentityType.GetDisplayName()</MudText>
                 </CardHeaderContent>
                 <CardHeaderActions>
                     <MudMenu Icon="@Icons.Material.Filled.Settings"
                              Color="Color.Primary">
-                        <MudMenuItem OnClick="() => DialogService.ShowUpdateTelegramIntegration()" Label="Интеграция с телеграмм" />
-                        <MudMenuItem OnClick="() => { Session.ClearSession();  }" Label="Выход" />
+                        <MudMenuItem OnClick="() => DialogService.ShowUpdateTelegramIntegration()"
+                                     Label="Интеграция с телеграмм"/>
+                        <MudMenuItem OnClick="() => { Session.ClearSession();  }" Label="Выход"/>
                     </MudMenu>
                 </CardHeaderActions>
             </MudCardHeader>
         }
-        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Book">Мои заявки</MudNavLink>
-        <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.Science">Админ панель</MudNavLink>
+        else
+        {
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+        }
+        <MudNavGroup Title="Этот пользователь" Icon="@Icons.Material.Filled.Person" Expanded="true">
+            <MudNavLink Icon="@Icons.Material.Filled.Mail" Href="/tickets/me">Заявки</MudNavLink>
+        </MudNavGroup>
+        @if(Session.DeskToken?.IdentityType is IdentityType.TechSupport)
+        {
+            <MudNavGroup Title="IT служба" Icon="@Icons.Material.Filled.ElectricBolt" Expanded="true">
+                <MudNavLink Icon="@Icons.Material.Filled.Discount" Href="/tickets/new">Не разобранные</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/tickets/new">Мои в работе</MudNavLink>
+            </MudNavGroup>
+        }
     </MudNavMenu>
 </MudPaper>
 
 @code {
 
-    private DeskToken? _deskToken;
-
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _deskToken = await Session.GetCurrentAccessToken();
+        await Session.GetCurrentAccessToken();
     }
 
 }
