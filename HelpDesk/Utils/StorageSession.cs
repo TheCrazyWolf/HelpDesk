@@ -9,7 +9,7 @@ public class StorageSession(TokenEncryptionService tokenEncryptionService, Navig
     ILocalStorageService localStorageService, AuthService authService)
 {
     private readonly string _paramStorageNameToken = "Token";
-    private string loginPage = "/auth/login";
+    private readonly string _loginPage = "/auth/login";
     public DeskToken? DeskToken { get; private set; }
     
 #pragma warning disable CS8603 // Possible null reference return.
@@ -21,7 +21,7 @@ public class StorageSession(TokenEncryptionService tokenEncryptionService, Navig
 
         if (DeskToken == null || ! DeskToken.IsValid())
         {
-            navigationManager.NavigateTo("/auth/login");
+            navigationManager.NavigateTo(_loginPage);
         }
         return DeskToken;
     }
@@ -45,5 +45,6 @@ public class StorageSession(TokenEncryptionService tokenEncryptionService, Navig
     {
         DeskToken = null!;
         await localStorageService.SetItemAsync(_paramStorageNameToken, string.Empty);
+        navigationManager.NavigateTo(_loginPage);
     }
 }

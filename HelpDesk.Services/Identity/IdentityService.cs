@@ -2,6 +2,7 @@
 using HelpDesk.Models.Dto.Identity;
 using HelpDesk.Models.Enums.Identity;
 using HelpDesk.Models.PLA.Accounts;
+using HelpDesk.Services.ThrowHelpers;
 using HelpDesk.Services.Utils;
 using HelpDesk.Storage;
 using MapsterMapper;
@@ -79,5 +80,22 @@ public class IdentityService(HelpDeskContext ef, IMapper mapper)
         var users = await ef.Accounts.Where(x => userIds.Contains(x.Id)).ToListAsync();
         foreach (var account in users) ef.Remove(account);
         await ef.SaveChangesAsync();
+    }
+
+    public async Task UpdateTelegramId(IdentityUpdateTelegramId telegramDto)
+    {
+        var user = await ef.Accounts.FirstOrDefaultAsync(x => x.Id == telegramDto.Id);
+        user.ThrowIfNull(nameof(Account));
+        mapper.Map(telegramDto, user);
+        ef.Update(user);
+        await ef.SaveChangesAsync();
+    }
+
+
+    public async Task<IdentityUpdateTelegramId> GetDtoTelegramId(long? idAccount)
+    {
+        var user = await ef.Accounts.FirstOrDefaultAsync(x => x.Id == idAccount);
+        user.ThrowIfNull(nameof(Account));
+        return mapper.Map<IdentityUpdateTelegramId>(user);
     }
 }

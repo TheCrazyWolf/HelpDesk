@@ -1,9 +1,11 @@
-﻿@using HelpDesk.Models.Dto.Auth
+﻿@using HelpDesk.Modals
+@using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Utils
 
 @inject StorageSession Session
 @inject NavigationManager Navigation
+@inject IDialogService DialogService
 
 <MudPaper Width="300px" Elevation="0">
     <MudNavMenu Rounded="true" Margin="Margin.Dense" Class="pa-2">
@@ -20,7 +22,7 @@
                 <CardHeaderActions>
                     <MudMenu Icon="@Icons.Material.Filled.Settings"
                              Color="Color.Primary">
-                        <MudMenuItem Label="Интеграция с телеграмм" />
+                        <MudMenuItem OnClick="() => DialogService.ShowUpdateTelegramIntegration()" Label="Интеграция с телеграмм" />
                         <MudMenuItem OnClick="() => { Session.ClearSession();  }" Label="Выход" />
                     </MudMenu>
                 </CardHeaderActions>

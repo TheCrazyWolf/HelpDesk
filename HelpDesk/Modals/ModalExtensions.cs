@@ -1,4 +1,5 @@
 ﻿using HelpDesk.Modals.Devices;
+using HelpDesk.Modals.Identity;
 using HelpDesk.Modals.Tickets;
 using HelpDesk.Models.Dto.Auth;
 using HelpDesk.Models.Dto.Devices;
@@ -58,6 +59,13 @@ public static class ModalExtensions
     {
         var parameters = new DialogParameters<TicketAddExecutor> { { "IdTicket", ticketId } };
         var dialog = await dialogService.ShowAsync<TicketAddExecutor>(title, parameters);
+        await dialog.Result;
+    }
+    
+    public static async Task ShowUpdateTelegramIntegration(this IDialogService dialogService, string title = "Интеграция с телеграмом")
+    {
+        var parameters = new DialogParameters<TelegramIntegration> { };
+        var dialog = await dialogService.ShowAsync<TelegramIntegration>(title, parameters);
         await dialog.Result;
     }
 }

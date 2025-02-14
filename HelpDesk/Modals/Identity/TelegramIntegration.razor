@@ -1,0 +1,89 @@
+﻿@using HelpDesk.Models.Dto.Identity
+@using HelpDesk.Services.Identity
+@using HelpDesk.Utils
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inject IdentityService IdentityService
+@inject StorageSession Session
+
+<EditForm Model="@TelegramDto" OnValidSubmit="SubmitAsync">
+    <DataAnnotationsValidator/>
+    <MudDialog>
+        <DialogContent>
+            @if (!string.IsNullOrEmpty(_errorMsg))
+            {
+                <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true"
+                          CloseIconClicked="() => _errorMsg = string.Empty">
+                    @_errorMsg
+                </MudAlert>
+            }
+            <MudTimeline TimelinePosition="TimelinePosition.Start" >
+                <MudTimelineItem Color="Color.Dark" Elevation="25">
+                    <ItemContent>
+                        <MudPaper Elevation="0" Class="mt-n1">
+                            <MudText Color="Color.Dark" Typo="Typo.h6" GutterBottom="true">Перейдите в телеграмм бота по адресу: </MudText>
+                            <MudText Typo="Typo.body2">Выполните команду /start и получите ID аккаунта</MudText>
+                        </MudPaper>
+                    </ItemContent>
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Dark" Elevation="25">
+                    <ItemContent>
+                        <MudPaper Elevation="0" Class="mt-n1">
+                            <MudText Color="Color.Dark" Typo="Typo.h6" GutterBottom="true">Внесите ID телеграм в поле ниже</MudText>
+                            <MudText Typo="Typo.body2">Нажмите сохранить и получайте оповещения о действиях с заявками прямо в телеграмм</MudText>
+                        </MudPaper>
+                    </ItemContent>
+                </MudTimelineItem>
+            </MudTimeline>
+            <MudStack Row="true">
+                <MudTextField T="long?" @bind-value="TelegramDto.TelegramId" Label="ID телеграмма"></MudTextField>
+            </MudStack>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Dark" OnClick="@Cancel">Закрыть</MudButton>
+            <MudButton Color="Color.Primary" OnClick="@SubmitAsync">Сохранить</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+    private IdentityUpdateTelegramId TelegramDto { get; set; } = new();
+    private string _errorMsg = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            TelegramDto = await IdentityService.GetDtoTelegramId(Session.DeskToken?.Id);
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            await IdentityService.UpdateTelegramId(TelegramDto);
+            MudDialog.Close();
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private void Cancel(MouseEventArgs arg)
+    {
+        MudDialog.Close();
+    }
+
+}

@@ -56,14 +56,13 @@
                         <MudSelectItem Value="@type">@type.GetDisplayName()</MudSelectItem>
                     }
                 </MudSelect>
-                <MudSelect @bind-Value="_createDto.Priority"
-                           Label="Приоритет">
+                <MudSelect @bind-Value="_createDto.Priority" Label="Приоритет">
                     @foreach (var levelPriority in Enum.GetValues(typeof(TicketLevelPriority)).Cast<TicketLevelPriority>())
                     {
                         <MudSelectItem Value="@levelPriority">@levelPriority.GetDisplayName()</MudSelectItem>
                     }
                 </MudSelect>
-                <MudTextField T="string" bind-Value="_createDto.PlaceOfIssue" Label="Место ЧП"/>
+                <MudTextField T="string" @bind-Value="_createDto.PlaceOfIssue" Label="Место ЧП"/>
                 <MudStack Class="mt-4" Row="true" Spacing="0">
                     <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Send"
                                OnClick="Sumbit"
