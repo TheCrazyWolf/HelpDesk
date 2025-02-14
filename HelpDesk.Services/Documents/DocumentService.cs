@@ -12,7 +12,10 @@ public class DocumentService(HelpDeskContext ef, IMapper mapper)
 {
     public async Task<IList<DeskDocumentView>> GetDocumentByTicket(long idTicket)
     {
-        return mapper.Map<IList<DeskDocumentView>>(await ef.Documents.Where(x => x.TicketId == idTicket).ToListAsync());
+        return mapper.Map<IList<DeskDocumentView>>(await ef.Documents
+            .Include(x=> x.User)
+            .Where(x => x.TicketId == idTicket)
+            .ToListAsync());
     }
     
     public async Task<IList<DeskDocumentView>> GetDocumentByHistoryTicket(long idHistoryTicket)

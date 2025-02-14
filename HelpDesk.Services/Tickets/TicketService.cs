@@ -13,6 +13,7 @@ public class TicketService(
     HelpDeskContext ef,
     DeviceInUseService deviceInUseService,
     TicketExecutorService ticketExecutorService,
+    TicketHistoryService ticketHistoryService,
     DocumentService documentService,
     IMapper mapper)
 {
@@ -24,6 +25,7 @@ public class TicketService(
         dto.Devices = await deviceInUseService.GetDevicesByTicket(idTicket);
         dto.Executors = await ticketExecutorService.GetExecutorsByTicket(idTicket);
         dto.Files = await documentService.GetDocumentByTicket(idTicket);
+        dto.Chat = await ticketHistoryService.GetTicketHistoryAsync(idTicket);
         return dto;
     }
 

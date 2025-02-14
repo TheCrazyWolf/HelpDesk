@@ -1,0 +1,93 @@
+﻿@using HelpDesk.Modals
+@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Dto.Tickets.History
+@using HelpDesk.Models.Enums.Extensions
+@using HelpDesk.Models.Enums.Identity
+@using HelpDesk.Models.PLA.Tickets
+@using HelpDesk.Services.Tickets
+
+@inject IDialogService DialogService
+@inject TicketExecutorService TicketExecutorService
+
+<MudText Typo="Typo.subtitle2" Class="mb-0 mt-4">Движение по заявке:</MudText>
+<MudForm>
+    @if (!string.IsNullOrEmpty(_errorMsg))
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+            @_errorMsg
+        </MudAlert>
+    }
+    <EditForm Model="@_ticketHistoryCreate" OnValidSubmit="SubmitAsync">
+        <DataAnnotationsValidator/>
+        <MudStack Class="mt-4" Row="false" Spacing="0">
+            <MudTextField T="string" For="() => _ticketHistoryCreate.Message" Variant="Variant.Outlined" @bind-Value="_ticketHistoryCreate.Message" Lines="3" Label="Сообщение"/>
+            <MudStack Class="mt-2" Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" StretchItems="StretchItems.None" Justify="Justify.FlexStart">
+                @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+                {
+                    <MudCheckBox @bind-Value="_ticketHistoryCreate.IsHideForUser" Size="Size.Small"
+                                 Class="ms-0"
+                                 Label="Скрыть для пользователя"/>
+                }
+                <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.FileDownload" OnClick="@SubmitAsync">Загрузить файлы</MudButton>
+                <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Send" OnClick="@SubmitAsync">Отправить</MudButton>
+            </MudStack>
+        </MudStack>
+    </EditForm>
+
+    <MudStack Class="mt-4" Row="true" Spacing="0">
+        @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+        {
+        }
+    </MudStack>
+
+    @foreach (var message in Ticket.Chat)
+    {
+        <MudChat ChatPosition="@(message.CreatedBy?.IdentityType is IdentityType.TechSupport ? ChatBubblePosition.End : ChatBubblePosition.Start)"
+                 ArrowPosition="ChatArrowPosition.Top" Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">
+            <MudAvatar Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">@message.CreatedBy?.LastName.FirstOrDefault()@message.CreatedBy?.FirstName.FirstOrDefault()</MudAvatar>
+            <MudChatHeader Name="@($"{message.CreatedBy?.LastName} {message.CreatedBy?.FirstName} {message.CreatedBy?.MiddleName}")" Time="@message.CreatedAt.ToString()"/>
+            <MudChatBubble>
+                @message.Message
+            </MudChatBubble>
+        </MudChat>
+    }
+
+</MudForm>
+
+@code {
+
+    [Parameter] public TicketView Ticket { get; set; } = new();
+    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
+    [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
+    private TicketHistoryCreate _ticketHistoryCreate = new();
+    private string _errorMsg = string.Empty;
+
+    private async Task Remove(TicketExecutorView executor)
+    {
+        try
+        {
+            await TicketExecutorService.RemoveExecutor(executor.Id, DeskToken!.Id);
+            await LoadTicketDelegate?.Invoke()!;
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    public async Task ShowModalDeadLine()
+    {
+        await DialogService.ShowUpdateDeadline(Ticket!.Id);
+        await LoadTicketDelegate?.Invoke()!;
+    }
+
+    private Task RemoveDevice(TicketDeviceInUseView device)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task SubmitAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+}

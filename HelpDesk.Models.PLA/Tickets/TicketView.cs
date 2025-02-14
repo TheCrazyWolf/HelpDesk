@@ -19,4 +19,5 @@ public class TicketView : PlaEntity
     public IList<TicketExecutorView> Executors { get; set; } = new List<TicketExecutorView>();
     public IList<TicketDeviceInUseView> Devices { get; set; } = new List<TicketDeviceInUseView>();
     public IList<DeskDocumentView> Files { get; set; } = new List<DeskDocumentView>();
+    public IList<TicketHistoryView> Chat { get; set; } = new List<TicketHistoryView>();
 }

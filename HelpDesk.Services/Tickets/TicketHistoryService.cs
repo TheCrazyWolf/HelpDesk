@@ -19,14 +19,18 @@ public class TicketHistoryService(HelpDeskContext ef, DocumentService documentSe
             .Select(x=> new TicketHistoryView
             {
                 Id = x.Id,
+                Message = x.Message,
                 CreatedBy = mapper.Map<IdentityView>(x.User!),
+                IsHideForUser = x.IsHideForUser,
                 CreatedAt = x.CreatedAt
-            }).ToListAsync();
+            }).OrderByDescending(x=> x.CreatedAt)
+            .ToListAsync();
     }
     
     public async Task CreateTicketHistory(TicketHistoryNew ticketHistory)
     {
         var ticketHistoryEntity = mapper.Map<TicketHistory>(ticketHistory);
+        ticketHistoryEntity.CreatedAt = DateTime.Now;
         await ef.AddAsync(ticketHistoryEntity);
         await ef.SaveChangesAsync();
         await documentService.AttachDocumentToTicketHistory(ticketHistoryEntity, ticketHistory.DocumentsIds);
