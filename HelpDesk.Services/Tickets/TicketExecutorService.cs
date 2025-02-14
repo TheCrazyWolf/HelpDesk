@@ -45,7 +45,7 @@ public class TicketExecutorService(
 
     public async Task RemoveExecutor(long idExecutor, long currentAccount)
     {
-        var executor = await ef.TicketHistories.FirstOrDefaultAsync(x => x.Id == idExecutor);
+        var executor = await ef.TicketExecutors.FirstOrDefaultAsync(x => x.Id == idExecutor);
         if (executor is null) throw new Exception("Исполнитель не найден");
         ef.Remove(executor);
         await ef.SaveChangesAsync();

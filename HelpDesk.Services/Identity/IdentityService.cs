@@ -17,7 +17,9 @@ public class IdentityService(HelpDeskContext ef, IMapper mapper)
     }
     public async Task<IList<IdentityView>> GetIdentityViews(IdentityType identityType)
     {
-        return mapper.Map<IList<IdentityView>>(await ef.Accounts.Where(x => x.IdentityType == identityType)
+        return mapper.Map<IList<IdentityView>>(await ef.Accounts.Where(x => x.IdentityType == identityType).OrderBy(x=> x.LastName)
+            .ThenBy(x=> x.FirstName)
+            .ThenBy(x=> x.MiddleName)
             .ToListAsync());
     }
     

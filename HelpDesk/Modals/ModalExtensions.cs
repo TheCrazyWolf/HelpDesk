@@ -45,4 +45,11 @@ public static class ModalExtensions
         var dialog = await dialogService.ShowAsync<TicketEditPriority>(title, parameters);
         await dialog.Result;
     }
+    
+    public static async Task ShowAssignExecutor(this IDialogService dialogService, long ticketId, long appointedId, string title = "Назначить нового исполнителя")
+    {
+        var parameters = new DialogParameters<TicketAddExecutor> { { "IdTicket", ticketId }, { "AppointedWhoId", appointedId } };
+        var dialog = await dialogService.ShowAsync<TicketAddExecutor>(title, parameters);
+        await dialog.Result;
+    }
 }

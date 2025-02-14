@@ -7,6 +7,7 @@
 @using HelpDesk.Components.Pages.Tickets.Forms.Components
 
 @inject TicketService TicketService
+@inject TicketExecutorService TicketExecutorService
 @inject StorageSession Session
 
 <MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">@_ticket?.Title</MudText>
@@ -24,7 +25,9 @@
         <MudPaper Class="mt-2" Elevation="0">
             <MudForm>
                 <AuthorOfTicket Ticket="_ticket"/>
-                <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken"  LoadTicketDelegate="_loadTicketDelegate"/>
+                <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken" 
+                                 Executors="_executors"
+                                 LoadTicketDelegate="_loadTicketDelegate"/>
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
@@ -52,6 +55,9 @@
     private string _errorMsg = string.Empty;
     private TicketView? _ticket;
     private DeskToken? _deskToken;
+    private IList<TicketExecutorView> _executors = new List<TicketExecutorView>();
+    
+    
     public delegate Task LoadTicketDelegate();
     public LoadTicketDelegate? _loadTicketDelegate;
     
@@ -63,17 +69,14 @@
         _loadTicketDelegate += LoadTicket;
         await LoadTicket();
     }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-    }
+    
 
     public async Task LoadTicket()
     {
         try
         {
             _ticket = await TicketService.GetTicket(Id);
+            _executors = await TicketExecutorService.GetExecutorsByTicket(Id);
             StateHasChanged();
         }
         catch (Exception e)

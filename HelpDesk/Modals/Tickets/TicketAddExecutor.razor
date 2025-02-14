@@ -1,0 +1,75 @@
+﻿@using HelpDesk.Models.Dto.Tickets.Executor
+@using HelpDesk.Models.Enums.Identity
+@using HelpDesk.Models.PLA.Accounts
+@using HelpDesk.Services.Identity
+@using HelpDesk.Services.Tickets
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inject IdentityService IdentityService
+@inject TicketExecutorService TicketExecutorService
+
+<EditForm Model="@IdTicket" OnValidSubmit="SubmitAsync">
+    <DataAnnotationsValidator/>
+    <MudDialog>
+        <DialogContent >
+            <MudStack Row="false">
+                @if (!string.IsNullOrEmpty(_errorMsg))
+                {
+                    <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+                        @_errorMsg
+                    </MudAlert>
+                }
+                <MudSelect @bind-Value="_ticketUpdate.UserId" Label="Выберите исполнителя">
+                    @foreach (var identity in _identityViews)
+                    {
+                        <MudSelectItem Value="@identity.Id">@identity.LastName @identity.FirstName @identity.MiddleName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudStack>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Dark" OnClick="@Cancel">Закрыть</MudButton>
+            <MudButton Color="Color.Primary" OnClick="@SubmitAsync">Сохранить</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public long IdTicket { get; set; } = new();
+    [Parameter] public long AppointedWhoId { get; set; } = new();
+
+    private IList<IdentityView> _identityViews = new List<IdentityView>();
+    private readonly AssignExecutorTicket _ticketUpdate = new();
+    private string _errorMsg = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _ticketUpdate.TicketId = IdTicket;
+        _ticketUpdate.AppointedWhoId = AppointedWhoId;
+        _identityViews = await IdentityService.GetIdentityViews(IdentityType.TechSupport);
+    }
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            await TicketExecutorService.AssignNewExecutor(_ticketUpdate);
+            MudDialog.Close();
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private void Cancel(MouseEventArgs arg)
+    {
+        MudDialog.Close();
+    }
+
+}

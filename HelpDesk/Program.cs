@@ -27,6 +27,8 @@ builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<DeviceInUseService>();
 builder.Services.AddScoped<DocumentService>();
 builder.Services.AddScoped<IdentityService>();
+builder.Services.AddScoped<TicketExecutorService>();
+builder.Services.AddScoped<TicketHistoryService>();
 builder.Services.AddSingleton<MfcServiceLogon>();
 builder.Services.AddSingleton<IAesService, AesService>();
 builder.Services.AddSingleton<IMapper, Mapper>();

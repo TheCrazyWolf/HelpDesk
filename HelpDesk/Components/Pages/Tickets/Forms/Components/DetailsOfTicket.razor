@@ -4,10 +4,12 @@
 @using HelpDesk.Models.Enums.Identity
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Identity
+@using HelpDesk.Services.Tickets
 
 @inject IdentityService IdentityService
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
+@inject TicketExecutorService TicketExecutorService
 
 <table class="mt-4">
     <tr>
@@ -105,7 +107,7 @@
         <td>
             <MudStack Row="true" Spacing="0" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center"
                       StretchItems="StretchItems.None">
-                @foreach (var executor in _executors)
+                @foreach (var executor in Executors)
                 {
                     if (DeskToken?.IdentityType == IdentityType.TechSupport)
                     {
@@ -121,13 +123,13 @@
                         </MudChip>
                     }
                 }
-                @if (_executors.Count is 0)
+                @if (Executors.Count is 0)
                 {
                     <MudText>Не назначено</MudText>
                 }
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
-                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Add"/>
+                    <MudIconButton Size="Size.Small" OnClick="ShowModalAddExecutor" Icon="@Icons.Material.Filled.Add"/>
                 }
             </MudStack>
         </td>
@@ -139,24 +141,25 @@
     [Parameter] public TicketView? Ticket { get; set; } = default!;
     [Parameter] public DeskToken? DeskToken { get; set; } = default!;
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
+    [Parameter] public  IList<TicketExecutorView> Executors { get; set; }  = new List<TicketExecutorView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
     
-    private IList<TicketExecutorView> _executors = new List<TicketExecutorView>();
-
-    protected override Task OnInitializedAsync()
-    {
-        LoadTicketDelegate += OnLoadTicketDelegateInvoked;
-        return base.OnInitializedAsync();
-    }
-
-    private Task OnLoadTicketDelegateInvoked()
-    {
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
 
     private async Task Remove(TicketExecutorView executor)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await TicketExecutorService.RemoveExecutor(executor.Id, DeskToken!.Id);
+            await LoadTicketDelegate?.Invoke()!;
+        }
+        catch (Exception e)
+        {
+           
+        }
     }
 
 
@@ -165,7 +168,7 @@
         await DialogService.ShowUpdateDeadline(Ticket!.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
-    
+
     public async Task ShowModalStatus()
     {
         await DialogService.ShowUpdateStatus(Ticket!.Id);
@@ -177,10 +180,17 @@
         await DialogService.ShowUpdateType(Ticket!.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
-    
+
     public async Task ShowModalPriority()
     {
         await DialogService.ShowUpdatePriority(Ticket!.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
+
+    public async Task ShowModalAddExecutor()
+    {
+        await DialogService.ShowAssignExecutor(Ticket!.Id, DeskToken!.Id);
+        await LoadTicketDelegate?.Invoke()!;
+    }
+
 }
