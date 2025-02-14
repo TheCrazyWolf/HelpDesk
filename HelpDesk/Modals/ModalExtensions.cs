@@ -18,6 +18,13 @@ public static class ModalExtensions
         return (DeviceView)dialog.Result.Result.Data;
     }
     
+    public static async Task ShowDeviceDialog(this IDialogService dialogService, DeviceDto deviceDto, long idTicket,  string title = "Device")
+    {
+        var parameters = new DialogParameters<DeviceAttachToTicket> { { "DeviceDto", deviceDto }, { "IdTicket", idTicket } };
+        var dialog = await dialogService.ShowAsync<DeviceAttachToTicket>(title, parameters);
+        await dialog.Result;
+    }
+    
     public static async Task ShowUpdateDeadline(this IDialogService dialogService, long ticketId, string title = "Редактирования срока решения")
     {
         var parameters = new DialogParameters<TicketEditDeadline> { { "IdTicket", ticketId } };

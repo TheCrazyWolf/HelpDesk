@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Components.Web
 
 @inject DeviceService DeviceService
+@inject DeviceInUseService DeviceServiceInUser
 
 <EditForm Model="@DeviceDto" OnValidSubmit="SubmitAsync">
     <DataAnnotationsValidator/>
@@ -14,7 +15,8 @@
         <DialogContent>
             @if (!string.IsNullOrEmpty(_errorMsg))
             {
-                <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+                <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true"
+                          CloseIconClicked="() => _errorMsg = string.Empty">
                     @_errorMsg
                 </MudAlert>
             }
@@ -22,7 +24,7 @@
                 <MudTextField T="string" @bind-value="DeviceDto.InvNumber" Label="Инвентарный номер"></MudTextField>
             </MudStack>
             <MudSelect @bind-Value="DeviceDto.Type"
-                       Label="Тип устройства">
+                       Label="Приоритет">
                 @foreach (var deviceType in Enum.GetValues(typeof(DeviceType)).Cast<DeviceType>())
                 {
                     <MudSelectItem Value="@deviceType">@deviceType.GetDisplayName()</MudSelectItem>
@@ -40,13 +42,16 @@
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public DeviceDto DeviceDto { get; set; } = new();
+    [Parameter] public long IdTicket { get; set; } = new();
     private string _errorMsg = string.Empty;
-    
+
     private async Task SubmitAsync()
     {
         try
         {
-            MudDialog.Close(await DeviceService.CreateOrUpdate(DeviceDto));
+            var view = await DeviceService.CreateOrUpdate(DeviceDto);
+            await DeviceServiceInUser.AttachDeviceToTicket([view.InvNumber], IdTicket);
+            MudDialog.Close();
         }
         catch (Exception e)
         {

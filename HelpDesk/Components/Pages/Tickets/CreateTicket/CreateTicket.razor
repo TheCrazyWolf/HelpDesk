@@ -10,6 +10,7 @@
 @using HelpDesk.Services.Tickets
 @using HelpDesk.Utils
 @using HelpDesk.Components.Pages.Tickets.CreateTicket.Components
+@using HelpDesk.Models.Enums.Identity
 
 @inject TicketService TicketService
 @inject StorageSession Session
@@ -33,7 +34,10 @@
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
-            <DeviceComponentOfTicketCreate CreateDto="_createDto"/>
+            @if (_deskToken?.IdentityType is not IdentityType.Student)
+            {
+                <DeviceComponentOfTicketCreate CreateDto="_createDto"/>
+            }
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
             <DocumentFilesOfTicketCreate CreateDto="_createDto" DeskToken="_deskToken"/>

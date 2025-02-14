@@ -1,12 +1,15 @@
 ﻿@using HelpDesk.Modals
 @using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Dto.Devices
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Models.Enums.Identity
 @using HelpDesk.Models.PLA.Tickets
+@using HelpDesk.Services.Devices
 @using HelpDesk.Services.Tickets
 
 @inject IDialogService DialogService
 @inject TicketExecutorService TicketExecutorService
+@inject DeviceInUseService DeviceServiceInUser
 
 <MudText Typo="Typo.subtitle2" Class="mb-0 mt-4">Оборудование в заявке</MudText>
 <MudForm>
@@ -14,7 +17,7 @@
         @if (DeskToken?.IdentityType is IdentityType.TechSupport)
         {
             <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create"
-                       Size="Size.Small"
+                       Size="Size.Small" OnClick="AttachNewDeviceToTicketModal"
                        Color="Color.Primary">
                 Добавить оборудование
             </MudButton>
@@ -22,7 +25,8 @@
     </MudStack>
     @if (!string.IsNullOrEmpty(_errorMsg))
     {
-        <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+        <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true"
+                  CloseIconClicked="() => _errorMsg = string.Empty">
             @_errorMsg
         </MudAlert>
     }
@@ -33,8 +37,9 @@
                 <code>@device.Device?.Type.GetDisplayName() №@device.Device?.InvNumber</code>
                 @if (DeskToken?.IdentityType is IdentityType.TechSupport)
                 {
-                    <MudIconButton OnClick="@(() => RemoveDevice(device))" Size="Size.Small" 
-                                   Variant="Variant.Outlined"Class="ms-4"Icon="@Icons.Material.Filled.Delete" Color="Color.Error"/>
+                    <MudIconButton OnClick="@(() => RemoveDevice(device))" Size="Size.Small"
+                                   Variant="Variant.Outlined" Class="ms-4" Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"/>
                 }
             </MudListItem>
         }
@@ -62,8 +67,23 @@
         }
     }
 
-    private Task RemoveDevice(TicketDeviceInUseView device)
+    private async Task RemoveDevice(TicketDeviceInUseView device)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await DeviceServiceInUser.RemoveDeviceFromTicket(device.Id);
+            await LoadTicketDelegate?.Invoke()!;
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
     }
+
+    public async Task AttachNewDeviceToTicketModal()
+    {
+        await DialogService.ShowDeviceDialog(new DeviceDto(), Ticket.Id);
+        await LoadTicketDelegate?.Invoke()!;
+    }
+
 }

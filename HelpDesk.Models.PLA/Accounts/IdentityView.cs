@@ -10,7 +10,7 @@ public class IdentityView : PlaEntity
     public string LastName { get; set; } = string.Empty;
     public string MiddleName { get; set; } = string.Empty;
     public IdentityType IdentityType { get; set; }
-
+    public bool IsMfcIntegration { get; set; }
     public IdentityView()
     {
         
@@ -23,6 +23,7 @@ public class IdentityView : PlaEntity
             FirstName = xUser.FirstName;
             LastName = xUser.LastName;
             MiddleName = xUser.MiddleName;
+            IsMfcIntegration = xUser.IsMfcIntegration;
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿@using HelpDesk.Models.PLA.Accounts
+﻿@using HelpDesk.Models.Dto.Auth
+@using HelpDesk.Models.Enums.Extensions
+@using HelpDesk.Models.Enums.Identity
+@using HelpDesk.Models.PLA.Accounts
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Identity
 
@@ -8,22 +11,32 @@
     Автор заявки:
 </MudText>
 <MudChat ChatPosition="ChatBubblePosition.Start" Color="Color.Primary" ArrowPosition="ChatArrowPosition.Bottom">
-    <MudAvatar Color="Color.Primary">@IdentityView?.LastName.FirstOrDefault()@IdentityView?.FirstName.FirstOrDefault()</MudAvatar>
+    <MudAvatar
+        Color="Color.Primary">@IdentityView?.LastName.FirstOrDefault()@IdentityView?.FirstName.FirstOrDefault()</MudAvatar>
     <MudChatHeader Name="@($"{IdentityView?.LastName} {IdentityView?.FirstName} {IdentityView?.MiddleName}")"/>
-    <MudChatBubble>
+    <MudChatBubble Style="width: 100%">
         @Ticket?.Description
     </MudChatBubble>
+    @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+    {
+        <MudChatFooter Class="mt-2 ">
+            <MudText Typo="Typo.subtitle2" Class="mb-0" >
+                Роль в системе: @IdentityView?.IdentityType.GetDisplayName(). Авторизован через ЛК: @(IdentityView?.IsMfcIntegration is true ? "Да" : "Нет").
+            </MudText>
+        </MudChatFooter>
+    }
 </MudChat>
 
 @code {
-    
+
     [Parameter] public TicketView? Ticket { get; set; } = default!;
+    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
     private IdentityView? IdentityView;
 
     protected override async Task OnParametersSetAsync()
     {
-       await base.OnParametersSetAsync();
-       IdentityView = await IdentityService.GetIdentityView(Ticket?.UserId);
+        await base.OnParametersSetAsync();
+        IdentityView = await IdentityService.GetIdentityView(Ticket?.UserId);
     }
 
 }

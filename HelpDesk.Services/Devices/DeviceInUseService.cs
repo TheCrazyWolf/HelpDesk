@@ -36,4 +36,12 @@ public class DeviceInUseService(HelpDeskContext ef, IMapper mapper)
             })
             .ToListAsync();
     }
+
+    public async Task RemoveDeviceFromTicket(long deviceInUserId)
+    {
+        var deviceInUse = await ef.DeviceInUseTickets.FirstOrDefaultAsync(x=> x.Id == deviceInUserId);
+        if(deviceInUse == null) throw new Exception("Device not found");
+        ef.Remove(deviceInUse);
+        await ef.SaveChangesAsync();
+    }
 }
