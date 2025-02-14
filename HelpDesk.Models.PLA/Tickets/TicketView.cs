@@ -1,5 +1,6 @@
 ﻿using HelpDesk.Models.Enums.Tickets;
 using HelpDesk.Models.PLA.Common;
+using HelpDesk.Models.PLA.Documents;
 
 namespace HelpDesk.Models.PLA.Tickets;
 
@@ -17,4 +18,5 @@ public class TicketView : PlaEntity
     public long? UserId { get; set; }
     public IList<TicketExecutorView> Executors { get; set; } = new List<TicketExecutorView>();
     public IList<TicketDeviceInUseView> Devices { get; set; } = new List<TicketDeviceInUseView>();
+    public IList<DeskDocumentView> Files { get; set; } = new List<DeskDocumentView>();
 }

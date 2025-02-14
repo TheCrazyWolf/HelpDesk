@@ -21,7 +21,7 @@
             </ActivatorContent>
         </MudFileUpload>
     </MudStack>
-    <MudList Class="mt-2" T="DeviceView">
+    <MudList Class="mt-2" T="DeskDocumentView">
         @if (!string.IsNullOrEmpty(_errorMsg))
         {
             <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">

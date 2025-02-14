@@ -28,6 +28,8 @@
                                  LoadTicketDelegate="_loadTicketDelegate"/>
                 <DeviceInUseOfTicket Ticket="_ticket" DeskToken="_deskToken"
                                      LoadTicketDelegate="_loadTicketDelegate"/>
+                <DocumentInUseOfTicket Ticket="_ticket" DeskToken="_deskToken"
+                                       LoadTicketDelegate="_loadTicketDelegate"/>
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
@@ -53,8 +55,8 @@
 
     [Parameter] public long Id { get; set; }
     private string _errorMsg = string.Empty;
-    private TicketView _ticket = new ();
-    private DeskToken _deskToken = new ();
+    private TicketView _ticket = new();
+    private DeskToken _deskToken = new();
 
     public delegate Task LoadTicketDelegate();
 

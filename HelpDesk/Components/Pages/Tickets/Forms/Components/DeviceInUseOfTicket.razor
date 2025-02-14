@@ -27,7 +27,7 @@
         </MudAlert>
     }
     <MudList Class="mt-2" T="TicketDeviceInUseView">
-        @foreach (var device in Ticket!.Devices)
+        @foreach (var device in Ticket.Devices)
         {
             <MudListItem Icon="@Icons.Material.Filled.Devices">
                 <code>@device.Device?.Type.GetDisplayName() №@device.Device?.InvNumber</code>
@@ -41,7 +41,7 @@
 
 @code {
 
-    [Parameter] public TicketView? Ticket { get; set; } = default!;
+    [Parameter] public TicketView Ticket { get; set; } = new();
     [Parameter] public DeskToken? DeskToken { get; set; } = default!;
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
 
@@ -69,5 +69,4 @@
     {
         throw new NotImplementedException();
     }
-
 }
