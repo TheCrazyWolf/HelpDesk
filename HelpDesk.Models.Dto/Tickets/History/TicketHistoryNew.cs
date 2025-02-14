@@ -1,4 +1,6 @@
-﻿namespace HelpDesk.Models.Dto.Tickets.History;
+﻿using HelpDesk.Models.PLA.Documents;
+
+namespace HelpDesk.Models.Dto.Tickets.History;
 
 public class TicketHistoryNew
 {
@@ -6,20 +8,20 @@ public class TicketHistoryNew
     public long UserId { get; set; }
     public string Message { get; set; } = string.Empty;
     public bool IsHideForUser { get; set; }
-    public IList<long> DocumentsIds { get; set; } = new List<long>();
+    public IList<DeskDocumentView> Files { get; set; } = new List<DeskDocumentView>();
 
     public TicketHistoryNew()
     {
 
     }
 
-    public TicketHistoryNew(long ticketId, long userId, string message, bool isHideForUser, IList<long> documentsIds)
+    public TicketHistoryNew(long ticketId, long userId, string message, bool isHideForUser, IList<DeskDocumentView> documents)
     {
         TicketId = ticketId;
         UserId = userId;
         Message = message;
         IsHideForUser = isHideForUser;
-        DocumentsIds = documentsIds;
+        Files = documents;
     }
     
     public TicketHistoryNew(long? ticketId, long? userId, string message, bool isHideForUser)

@@ -5,6 +5,7 @@
 @using HelpDesk.Utils
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Components.Pages.Tickets.Forms.Components
+@using HelpDesk.Models.Enums.Identity
 
 @inject TicketService TicketService
 @inject StorageSession Session
@@ -21,7 +22,7 @@
 
 <MudGrid>
     <MudItem xs="12" sm="6">
-        <MudPaper Class="mt-2" Elevation="0">
+        <MudPaper Class="mt-2 " Elevation="0">
             <MudForm>
                 <AuthorOfTicket Ticket="_ticket"/>
                 <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken"
@@ -39,15 +40,12 @@
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudPaper Class="mt-2" Elevation="0">
+        <MudPaper Style="padding: 25px; overflow: auto; max-height: calc(100vh - 28vh); " Elevation="9">
             <ChatOfTicket Ticket="_ticket" DeskToken="_deskToken"
                           LoadTicketDelegate="_loadTicketDelegate"/>
-            <MudForm>
-            </MudForm>
         </MudPaper>
     </MudItem>
 </MudGrid>
-
 
 @code {
 
@@ -63,7 +61,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _deskToken = await Session.GetCurrentAccessToken() ?? throw new Exception("Invalid token");
+        _deskToken = await Session.GetCurrentAccessToken();
         _loadTicketDelegate += LoadTicket;
         await LoadTicket();
     }
@@ -73,7 +71,13 @@
     {
         try
         {
-            _ticket = await TicketService.GetTicket(Id);
+            _ticket = await TicketService.GetTicket(Id) ?? throw new Exception("Не удалось загрузить тикет");
+            if ((_ticket.UserId != _deskToken.Id) && _deskToken.IdentityType is not IdentityType.TechSupport)
+            {
+                _ticket = new TicketView();
+                throw new Exception("У вас нет прав на просмотр заявок, которые Вы не создавали");
+            }
+
             StateHasChanged();
         }
         catch (Exception e)

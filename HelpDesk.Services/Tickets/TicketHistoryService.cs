@@ -13,7 +13,7 @@ public class TicketHistoryService(HelpDeskContext ef, DocumentService documentSe
 {
     public async Task<IList<TicketHistoryView>> GetTicketHistoryAsync(long idTicket)
     {
-        return await ef.TicketHistories
+        var items = await ef.TicketHistories
             .Include(x=> x.User)
             .Where(x=> x.TicketId == idTicket)
             .Select(x=> new TicketHistoryView
@@ -25,6 +25,9 @@ public class TicketHistoryService(HelpDeskContext ef, DocumentService documentSe
                 CreatedAt = x.CreatedAt
             }).OrderByDescending(x=> x.CreatedAt)
             .ToListAsync();
+
+        foreach (var history in items) history.Files = await documentService.GetDocumentByHistoryTicket(history.Id);
+        return items;
     }
     
     public async Task CreateTicketHistory(TicketHistoryNew ticketHistory)
@@ -33,7 +36,7 @@ public class TicketHistoryService(HelpDeskContext ef, DocumentService documentSe
         ticketHistoryEntity.CreatedAt = DateTime.Now;
         await ef.AddAsync(ticketHistoryEntity);
         await ef.SaveChangesAsync();
-        await documentService.AttachDocumentToTicketHistory(ticketHistoryEntity, ticketHistory.DocumentsIds);
+        await documentService.AttachDocumentToTicketHistory(ticketHistoryEntity, ticketHistory.Files.Select(x=> x.Id).ToArray());
     }
     
 }

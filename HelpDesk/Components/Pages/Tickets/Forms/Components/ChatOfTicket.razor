@@ -1,65 +1,107 @@
-﻿@using HelpDesk.Modals
+﻿@using BlazorDownloadFile
 @using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Dto.Tickets.History
-@using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Models.Enums.Identity
+@using HelpDesk.Models.Enums.Tickets
+@using HelpDesk.Models.PLA.Documents
 @using HelpDesk.Models.PLA.Tickets
+@using HelpDesk.Services.Documents
 @using HelpDesk.Services.Tickets
 
 @inject IDialogService DialogService
 @inject TicketExecutorService TicketExecutorService
+@inject TicketHistoryService TicketHistoryService
+@inject DocumentService DocumentService
+@inject IBlazorDownloadFileService BlazorDownloadFileService
 
-<MudText Typo="Typo.subtitle2" Class="mb-0 mt-4">Движение по заявке:</MudText>
-<MudForm>
-    @if (!string.IsNullOrEmpty(_errorMsg))
-    {
-        <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
-            @_errorMsg
-        </MudAlert>
-    }
+<MudText Typo="Typo.subtitle2">Движение по заявке:</MudText>
+@if (!string.IsNullOrEmpty(_errorMsg))
+{
+    <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true"
+              CloseIconClicked="() => _errorMsg = string.Empty">
+        @_errorMsg
+    </MudAlert>
+}
+@if (Ticket.Status is not (TicketStatus.Closed or TicketStatus.Resolved))
+{
     <EditForm Model="@_ticketHistoryCreate" OnValidSubmit="SubmitAsync">
         <DataAnnotationsValidator/>
         <MudStack Class="mt-4" Row="false" Spacing="0">
-            <MudTextField T="string" For="() => _ticketHistoryCreate.Message" Variant="Variant.Outlined" @bind-Value="_ticketHistoryCreate.Message" Lines="3" Label="Сообщение"/>
-            <MudStack Class="mt-2" Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" StretchItems="StretchItems.None" Justify="Justify.FlexStart">
+            <MudTextField T="string" For="() => _ticketHistoryCreate.Message" Variant="Variant.Outlined"
+                          @bind-Value="_ticketHistoryCreate.Message" Lines="2" Label="Оставьте комментарий по заявке"/>
+            @if (_ticketHistoryCreate.Files.Count != 0)
+            {
+                <MudText Typo="Typo.subtitle2" Class="mb-0 mt-2">Вложения к комментарию:</MudText>
+            }
+            @foreach (var file in _ticketHistoryCreate.Files)
+            {
+                <MudStack Row="true" Spacing="0">
+                    <MudLink OnClick="() => DownloadFile(file)">@file.FileName</MudLink>
+                    <MudIconButton Class="ms-4" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveFile(file)" Icon="@Icons.Material.Filled.Delete"/>
+                </MudStack>
+            }
+            <MudStack Class="mt-2" Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center"
+                      StretchItems="StretchItems.None" Justify="Justify.FlexStart">
                 @if (DeskToken?.IdentityType is IdentityType.TechSupport)
                 {
                     <MudCheckBox @bind-Value="_ticketHistoryCreate.IsHideForUser" Size="Size.Small"
                                  Class="ms-0"
                                  Label="Скрыть для пользователя"/>
                 }
-                <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.FileDownload" OnClick="@SubmitAsync">Загрузить файлы</MudButton>
-                <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Send" OnClick="@SubmitAsync">Отправить</MudButton>
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles!">
+                    <ActivatorContent>
+                        <MudButton Color="Color.Primary" Size="Size.Small"
+                                   Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.FileDownload">
+                            Загрузить файлы
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+                <MudButton Color="Color.Primary" Size="Size.Small"
+                           Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Send"
+                           OnClick="@SubmitAsync">
+                    Отправить
+                </MudButton>
             </MudStack>
         </MudStack>
     </EditForm>
-
-    <MudStack Class="mt-4" Row="true" Spacing="0">
-        @if (DeskToken?.IdentityType is IdentityType.TechSupport)
-        {
-        }
-    </MudStack>
-
-    @foreach (var message in Ticket.Chat)
+}
+<MudStack Class="mt-4" Row="true" Spacing="0">
+    @if (DeskToken?.IdentityType is IdentityType.TechSupport)
     {
-        <MudChat ChatPosition="@(message.CreatedBy?.IdentityType is IdentityType.TechSupport ? ChatBubblePosition.End : ChatBubblePosition.Start)"
-                 ArrowPosition="ChatArrowPosition.Top" Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">
-            <MudAvatar Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">@message.CreatedBy?.LastName.FirstOrDefault()@message.CreatedBy?.FirstName.FirstOrDefault()</MudAvatar>
-            <MudChatHeader Name="@($"{message.CreatedBy?.LastName} {message.CreatedBy?.FirstName} {message.CreatedBy?.MiddleName}")" Time="@message.CreatedAt.ToString()"/>
-            <MudChatBubble>
-                @message.Message
-            </MudChatBubble>
-        </MudChat>
     }
-
-</MudForm>
+</MudStack>
+@foreach (var message in Ticket.Chat)
+{
+    @if (message.IsHideForUser && DeskToken?.IdentityType is not IdentityType.TechSupport) continue;
+    <MudChat Class="mb-2" ChatPosition="@(message.CreatedBy?.IdentityType is IdentityType.TechSupport ? ChatBubblePosition.End : ChatBubblePosition.Start)"
+             ArrowPosition="ChatArrowPosition.Bottom" Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">
+        <MudAvatar Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">
+            @message.CreatedBy?.LastName.FirstOrDefault()@message.CreatedBy?.FirstName.FirstOrDefault()
+        </MudAvatar>
+        <MudChatHeader Name="@($"{message.CreatedBy?.LastName} {message.CreatedBy?.FirstName} {message.CreatedBy?.MiddleName}")" Time="@message.CreatedAt.ToString()"/>
+        <MudChatBubble>
+            @message.Message
+        </MudChatBubble>
+        @if (message.Files.Count != 0)
+        {
+            <MudChatBubble >
+                <MudStack Row="false" Spacing="0">
+                    @foreach (var file in message.Files)
+                    {
+                        <MudLink Typo="Typo.body2" OnClick="() => DownloadFile(file)">@file.FileName</MudLink>
+                    }
+                </MudStack>
+            </MudChatBubble>
+        }
+    </MudChat>
+}
 
 @code {
 
     [Parameter] public TicketView Ticket { get; set; } = new();
     [Parameter] public DeskToken? DeskToken { get; set; } = default!;
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
-    private TicketHistoryCreate _ticketHistoryCreate = new();
+    private TicketHistoryNew _ticketHistoryCreate = new();
     private string _errorMsg = string.Empty;
 
     private async Task Remove(TicketExecutorView executor)
@@ -71,23 +113,62 @@
         }
         catch (Exception e)
         {
+            _errorMsg = e.Message;
         }
-    }
-
-    public async Task ShowModalDeadLine()
-    {
-        await DialogService.ShowUpdateDeadline(Ticket!.Id);
-        await LoadTicketDelegate?.Invoke()!;
-    }
-
-    private Task RemoveDevice(TicketDeviceInUseView device)
-    {
-        throw new NotImplementedException();
     }
 
     private async Task SubmitAsync()
     {
-        throw new NotImplementedException();
+        try
+        {
+            _ticketHistoryCreate.UserId = DeskToken?.Id ?? throw new Exception("Invalid token");
+            _ticketHistoryCreate.TicketId = Ticket.Id;
+            await TicketHistoryService.CreateTicketHistory(_ticketHistoryCreate);
+            await LoadTicketDelegate?.Invoke()!;
+            _ticketHistoryCreate = new TicketHistoryNew();
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private async Task UploadFiles(IReadOnlyList<IBrowserFile> arg)
+    {
+        try
+        {
+            foreach (var file in arg) _ticketHistoryCreate.Files.Add(await DocumentService.UploadFile(file, DeskToken!.Id));
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private async Task DownloadFile(DeskDocumentView fileId)
+    {
+        try
+        {
+            var stream = await DocumentService.DownloadFileAsync(fileId.Id);
+            await BlazorDownloadFileService.DownloadFile(fileId.FileName, stream.ToArray(), "application/octet-stream");
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
+    }
+
+    private async Task RemoveFile(DeskDocumentView file)
+    {
+        try
+        {
+            await DocumentService.RemoveFile(file.Id);
+            _ticketHistoryCreate.Files.Remove(file);
+        }
+        catch (Exception e)
+        {
+            _errorMsg = e.Message;
+        }
     }
 
 }
