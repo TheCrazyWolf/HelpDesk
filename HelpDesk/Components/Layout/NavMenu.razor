@@ -18,7 +18,11 @@
                     <MudText Typo="Typo.body2">@_deskToken.IdentityType.GetDisplayName()</MudText>
                 </CardHeaderContent>
                 <CardHeaderActions>
-                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default"/>
+                    <MudMenu Icon="@Icons.Material.Filled.Settings"
+                             Color="Color.Primary">
+                        <MudMenuItem Label="Интеграция с телеграмм" />
+                        <MudMenuItem OnClick="() => { Session.ClearSession();  }" Label="Выход" />
+                    </MudMenu>
                 </CardHeaderActions>
             </MudCardHeader>
         }
@@ -35,7 +39,6 @@
     {
         await base.OnInitializedAsync();
         _deskToken = await Session.GetCurrentAccessToken();
-        if (_deskToken is null || !_deskToken.IsValid()) Navigation.NavigateTo("/auth/login");
     }
 
 }
