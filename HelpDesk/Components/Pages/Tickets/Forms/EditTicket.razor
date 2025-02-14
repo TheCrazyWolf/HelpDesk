@@ -25,15 +25,15 @@
     <MudItem xs="12" sm="6">
         <MudPaper Class="mt-2" Elevation="0">
             <MudForm>
-                <AuthorOfTicket Ticket="_ticket" DeskToken="_deskToken"/>
-                <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken"
+                <AuthorOfTicket Ticket="_ticket" />
+                <DetailsOfTicket Ticket="_ticket"
                                  LoadTicketDelegate="_loadTicketDelegate"/>
                 @if (_deskToken.IdentityType is not IdentityType.Student)
                 {
-                    <DeviceInUseOfTicket Ticket="_ticket" DeskToken="_deskToken"
+                    <DeviceInUseOfTicket Ticket="_ticket" 
                                          LoadTicketDelegate="_loadTicketDelegate"/>
                 }
-                <DocumentInUseOfTicket Ticket="_ticket" DeskToken="_deskToken"
+                <DocumentInUseOfTicket Ticket="_ticket" 
                                        LoadTicketDelegate="_loadTicketDelegate"/>
             </MudForm>
         </MudPaper>
@@ -41,7 +41,7 @@
     <MudItem xs="12" sm="6">
         <MudPaper Style="padding: 25px; overflow: auto; max-height: calc(100vh - 28vh); border-radius: 6px;"
                   Elevation="9">
-            <ChatOfTicket Ticket="_ticket" DeskToken="_deskToken"
+            <ChatOfTicket Ticket="_ticket" 
                           LoadTicketDelegate="_loadTicketDelegate"/>
         </MudPaper>
     </MudItem>

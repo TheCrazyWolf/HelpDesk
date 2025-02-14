@@ -1,5 +1,6 @@
 ﻿using HelpDesk.Models.DLA.Documents;
 using HelpDesk.Models.DLA.Tickets;
+using HelpDesk.Models.Dto.Auth;
 using HelpDesk.Models.PLA.Documents;
 using HelpDesk.Storage;
 using MapsterMapper;
@@ -66,9 +67,9 @@ public class DocumentService(HelpDeskContext ef, IMapper mapper)
         await ef.SaveChangesAsync();
     }
 
-    public async Task<DeskDocumentView> UploadFile(IBrowserFile file, long ownerFileId)
+    public async Task<DeskDocumentView> UploadFile(IBrowserFile file, DeskToken? deskToken)
     {
-        var userId = ownerFileId;
+        var userId = deskToken.Id;
         var filesDirectory = Path.Combine(Directory.GetCurrentDirectory(), "files");
         if (!Directory.Exists(filesDirectory)) Directory.CreateDirectory(filesDirectory);
         var userDirectory = Path.Combine(filesDirectory, userId.ToString());

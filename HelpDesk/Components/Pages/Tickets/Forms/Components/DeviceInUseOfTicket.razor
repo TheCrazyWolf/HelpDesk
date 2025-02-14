@@ -6,15 +6,17 @@
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Devices
 @using HelpDesk.Services.Tickets
+@using HelpDesk.Utils
 
 @inject IDialogService DialogService
 @inject TicketExecutorService TicketExecutorService
 @inject DeviceInUseService DeviceServiceInUser
+@inject StorageSession Session
 
 <MudText Typo="Typo.subtitle2" Class="mb-0 mt-4">Оборудование в заявке</MudText>
 <MudForm>
     <MudStack Class="mt-4" Row="true" Spacing="0">
-        @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+        @if (Session.DeskToken?.IdentityType is IdentityType.TechSupport)
         {
             <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create"
                        Size="Size.Small" OnClick="AttachNewDeviceToTicketModal"
@@ -35,7 +37,7 @@
         {
             <MudListItem Icon="@Icons.Material.Filled.Devices">
                 <code>@device.Device?.Type.GetDisplayName() №@device.Device?.InvNumber</code>
-                @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+                @if (Session.DeskToken?.IdentityType is IdentityType.TechSupport)
                 {
                     <MudIconButton OnClick="@(() => RemoveDevice(device))" Size="Size.Small"
                                    Variant="Variant.Outlined" Class="ms-4" Icon="@Icons.Material.Filled.Delete"
@@ -49,7 +51,6 @@
 @code {
 
     [Parameter] public TicketView Ticket { get; set; } = new();
-    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
 
     private string _errorMsg = string.Empty;
@@ -58,7 +59,7 @@
     {
         try
         {
-            await TicketExecutorService.RemoveExecutor(executor.Id, DeskToken!.Id);
+            await TicketExecutorService.RemoveExecutor(executor.Id, await Session.GetCurrentAccessToken());
             await LoadTicketDelegate?.Invoke()!;
         }
         catch (Exception e)

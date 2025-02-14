@@ -1,11 +1,15 @@
 ﻿using HelpDesk.Models.DLA.Tickets;
+using HelpDesk.Models.Dto.Auth;
 using HelpDesk.Models.Dto.Tickets.Tickets;
 using HelpDesk.Models.PLA.Tickets;
 using HelpDesk.Services.Devices;
 using HelpDesk.Services.Documents;
+using HelpDesk.Services.ThrowHelpers;
 using HelpDesk.Storage;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8604 // Possible null reference argument.
 
 namespace HelpDesk.Services.Tickets;
 
@@ -20,7 +24,7 @@ public class TicketService(
     public async Task<TicketView?> GetTicket(long idTicket)
     {
         var ticket = await ef.Tickets.FirstOrDefaultAsync(t => t.Id == idTicket);
-        if (ticket == null) throw new Exception("Заявка не найдена");
+        ticket.ThrowIfNull(nameof(Ticket));
         var dto = mapper.Map<TicketView>(ticket);
         dto.Devices = await deviceInUseService.GetDevicesByTicket(idTicket);
         dto.Executors = await ticketExecutorService.GetExecutorsByTicket(idTicket);
@@ -32,6 +36,7 @@ public class TicketService(
     public async Task<long> CreateTicket(TicketCreateDto ticket)
     {
         var ticketEntity = mapper.Map<Ticket>(ticket);
+        ticketEntity.UpdatedAt = DateTime.Now;
         await ef.AddAsync(ticketEntity);
         await ef.SaveChangesAsync();
         await documentService.AttachDocumentToTicket(ticketEntity, ticket.Files.Select(x => x.Id).ToArray());
@@ -39,44 +44,48 @@ public class TicketService(
         return ticketEntity.Id;
     }
 
-    public async Task UpdateDeadLine(TicketUpdateDeadLine ticketUpdateDeadLine)
+    public async Task UpdateDeadLine(TicketUpdateDeadLine ticketUpdateDeadLine, DeskToken? deskToken)
     {
         var ticket = await ef.Tickets.FirstOrDefaultAsync(x => x.Id == ticketUpdateDeadLine.Id);
-        if (ticket == null) throw new Exception("Заявка не найдена");
+        ticket.ThrowIfNull(nameof(Ticket));
         mapper.Map(ticketUpdateDeadLine, ticket);
         ticket.UpdatedAt = DateTime.Now;
         ef.Update(ticket);
         await ef.SaveChangesAsync();
+        await ticketHistoryService.NewHistoryDeadLine(ticket, deskToken);
     }
 
-    public async Task UpdateStatus(TicketUpdateStatus ticketUpdateStatus)
+    public async Task UpdateStatus(TicketUpdateStatus ticketUpdateStatus, DeskToken? deskToken)
     {
         var ticket = await ef.Tickets.FirstOrDefaultAsync(x => x.Id == ticketUpdateStatus.Id);
-        if (ticket == null) throw new Exception("Заявка не найдена");
+        ticket.ThrowIfNull(nameof(Ticket));
         mapper.Map(ticketUpdateStatus, ticket);
         ticket.UpdatedAt = DateTime.Now;
         ef.Update(ticket);
         await ef.SaveChangesAsync();
+        await ticketHistoryService.NewHistoryStatus(ticketUpdateStatus, deskToken);
     }
 
-    public async Task UpdateType(TicketUpdateType ticketUpdateType)
+    public async Task UpdateType(TicketUpdateType ticketUpdateType, DeskToken? deskToken)
     {
         var ticket = await ef.Tickets.FirstOrDefaultAsync(x => x.Id == ticketUpdateType.Id);
-        if (ticket == null) throw new Exception("Заявка не найдена");
+        ticket.ThrowIfNull(nameof(Ticket));
         mapper.Map(ticketUpdateType, ticket);
         ticket.UpdatedAt = DateTime.Now;
         ef.Update(ticket);
         await ef.SaveChangesAsync();
+        await ticketHistoryService.NewHistoryType(ticketUpdateType, deskToken);
     }
 
-    public async Task UpdatePriority(TicketUpdatePriority ticketUpdatePriority)
+    public async Task UpdatePriority(TicketUpdatePriority ticketUpdatePriority, DeskToken? deskToken)
     {
         var ticket = await ef.Tickets.FirstOrDefaultAsync(x => x.Id == ticketUpdatePriority.Id);
-        if (ticket == null) throw new Exception("Заявка не найдена");
+        ticket.ThrowIfNull(nameof(Ticket));
         mapper.Map(ticketUpdatePriority, ticket);
         ticket.UpdatedAt = DateTime.Now;
         ef.Update(ticket);
         await ef.SaveChangesAsync();
+        await ticketHistoryService.NewUpdatePriority(ticketUpdatePriority, deskToken);
     }
 
     public async Task<IEnumerable<TicketView>?> ShowTicketsByAccountId(long id)

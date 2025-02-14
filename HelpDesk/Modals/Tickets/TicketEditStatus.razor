@@ -2,11 +2,13 @@
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Models.Enums.Tickets
 @using HelpDesk.Services.Tickets
+@using HelpDesk.Utils
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 
 @inject TicketService TicketService
+@inject StorageSession SessionStorage
 
 <EditForm Model="@IdTicket" OnValidSubmit="SubmitAsync">
     <DataAnnotationsValidator/>
@@ -45,7 +47,7 @@
     {
         try
         {
-            await TicketService.UpdateStatus(_ticketUpdate);
+            await TicketService.UpdateStatus(_ticketUpdate, await SessionStorage.GetCurrentAccessToken());
             MudDialog.Close();
         }
         catch (Exception e)

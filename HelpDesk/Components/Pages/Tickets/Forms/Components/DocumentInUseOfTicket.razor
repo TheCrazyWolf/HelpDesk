@@ -31,7 +31,6 @@
 @code {
 
     [Parameter] public TicketView Ticket { get; set; } = new();
-    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
 
     private string _errorMsg = string.Empty;

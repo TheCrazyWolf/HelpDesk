@@ -3,12 +3,14 @@
 @using HelpDesk.Models.PLA.Accounts
 @using HelpDesk.Services.Identity
 @using HelpDesk.Services.Tickets
+@using HelpDesk.Utils
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 
 @inject IdentityService IdentityService
 @inject TicketExecutorService TicketExecutorService
+@inject StorageSession SessionStorage
 
 <EditForm Model="@IdTicket" OnValidSubmit="SubmitAsync">
     <DataAnnotationsValidator/>
@@ -51,7 +53,6 @@
     {
         await base.OnInitializedAsync();
         _ticketUpdate.TicketId = IdTicket;
-        _ticketUpdate.AppointedWhoId = AppointedWhoId;
         _identityViews = await IdentityService.GetIdentityViews(IdentityType.TechSupport);
     }
 
@@ -59,7 +60,7 @@
     {
         try
         {
-            await TicketExecutorService.AssignNewExecutor(_ticketUpdate);
+            await TicketExecutorService.AssignNewExecutor(_ticketUpdate, await SessionStorage.GetCurrentAccessToken());
             MudDialog.Close();
         }
         catch (Exception e)

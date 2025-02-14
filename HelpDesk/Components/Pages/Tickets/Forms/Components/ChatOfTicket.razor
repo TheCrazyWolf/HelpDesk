@@ -1,5 +1,4 @@
 ﻿@using BlazorDownloadFile
-@using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Dto.Tickets.History
 @using HelpDesk.Models.Enums.Identity
 @using HelpDesk.Models.Enums.Tickets
@@ -7,12 +6,14 @@
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Documents
 @using HelpDesk.Services.Tickets
+@using HelpDesk.Utils
 
 @inject IDialogService DialogService
 @inject TicketExecutorService TicketExecutorService
 @inject TicketHistoryService TicketHistoryService
 @inject DocumentService DocumentService
 @inject IBlazorDownloadFileService BlazorDownloadFileService
+@inject StorageSession Session
 
 <MudText Typo="Typo.subtitle2">Движение по заявке:</MudText>
 @if (!string.IsNullOrEmpty(_errorMsg))
@@ -37,12 +38,13 @@
             {
                 <MudStack Row="true" Spacing="0">
                     <MudLink OnClick="() => DownloadFile(file)">@file.FileName</MudLink>
-                    <MudIconButton Class="ms-4" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveFile(file)" Icon="@Icons.Material.Filled.Delete"/>
+                    <MudIconButton Class="ms-4" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveFile(file)"
+                                   Icon="@Icons.Material.Filled.Delete"/>
                 </MudStack>
             }
             <MudStack Class="mt-2" Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center"
                       StretchItems="StretchItems.None" Justify="Justify.FlexStart">
-                @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+                @if (Session.DeskToken?.IdentityType is IdentityType.TechSupport)
                 {
                     <MudCheckBox @bind-Value="_ticketHistoryCreate.IsHideForUser" Size="Size.Small"
                                  Class="ms-0"
@@ -68,13 +70,16 @@
 
 @foreach (var message in Ticket.Chat)
 {
-    @if (message.IsHideForUser && DeskToken?.IdentityType is not IdentityType.TechSupport) continue;
-    <MudChat Class="mb-2" ChatPosition="@(message.CreatedBy?.IdentityType is IdentityType.TechSupport ? ChatBubblePosition.End : ChatBubblePosition.Start)"
+    @if (message.IsHideForUser && Session.DeskToken?.IdentityType is not IdentityType.TechSupport) continue;
+    <MudChat Class="mb-2"
+             ChatPosition="@(message.CreatedBy?.IdentityType is IdentityType.TechSupport ? ChatBubblePosition.End : ChatBubblePosition.Start)"
              ArrowPosition="ChatArrowPosition.Bottom" Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">
         <MudAvatar Color="@(message.IsHideForUser ? Color.Warning : Color.Primary)">
             @message.CreatedBy?.LastName.FirstOrDefault()@message.CreatedBy?.FirstName.FirstOrDefault()
         </MudAvatar>
-        <MudChatHeader Name="@($"{message.CreatedBy?.LastName} {message.CreatedBy?.FirstName} {message.CreatedBy?.MiddleName}")" Time="@message.CreatedAt.ToString()"/>
+        <MudChatHeader
+            Name="@($"{message.CreatedBy?.LastName} {message.CreatedBy?.FirstName} {message.CreatedBy?.MiddleName}")"
+            Time="@message.CreatedAt.ToString()"/>
         <MudChatBubble Style="width: 100%;">
             @message.Message
         </MudChatBubble>
@@ -95,7 +100,6 @@
 @code {
 
     [Parameter] public TicketView Ticket { get; set; } = new();
-    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
     private TicketHistoryNew _ticketHistoryCreate = new();
     private string _errorMsg = string.Empty;
@@ -104,7 +108,7 @@
     {
         try
         {
-            await TicketExecutorService.RemoveExecutor(executor.Id, DeskToken!.Id);
+            await TicketExecutorService.RemoveExecutor(executor.Id, await Session.GetCurrentAccessToken());
             await LoadTicketDelegate?.Invoke()!;
         }
         catch (Exception e)
@@ -117,9 +121,8 @@
     {
         try
         {
-            _ticketHistoryCreate.UserId = DeskToken?.Id ?? throw new Exception("Invalid token");
             _ticketHistoryCreate.TicketId = Ticket.Id;
-            await TicketHistoryService.CreateTicketHistory(_ticketHistoryCreate);
+            await TicketHistoryService.CreateTicketHistory(_ticketHistoryCreate, await Session.GetCurrentAccessToken());
             await LoadTicketDelegate?.Invoke()!;
             _ticketHistoryCreate = new TicketHistoryNew();
         }
@@ -133,7 +136,7 @@
     {
         try
         {
-            foreach (var file in arg) _ticketHistoryCreate.Files.Add(await DocumentService.UploadFile(file, DeskToken!.Id));
+            foreach (var file in arg) _ticketHistoryCreate.Files.Add(await DocumentService.UploadFile(file, await Session.GetCurrentAccessToken()));
         }
         catch (Exception e)
         {

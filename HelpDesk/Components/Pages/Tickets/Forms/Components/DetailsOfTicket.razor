@@ -6,12 +6,13 @@
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Identity
 @using HelpDesk.Services.Tickets
+@using HelpDesk.Utils
 
 @inject IdentityService IdentityService
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
 @inject TicketExecutorService TicketExecutorService
-
+@inject StorageSession Session
 
 <MudSimpleTable Class="mt-4" Style="overflow-x: auto;" Dense="true" Hover="true" Elevation="0">
     <tbody>
@@ -38,7 +39,7 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText Color="@(Ticket.Deadline is null ? Color.Error : Color.Surface)" >@(Ticket.Deadline is null ? "Не назначено" : Ticket.Deadline.Value.ToString("dd.MM.yyyy"))</MudText>
-                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
+                @if (Session.DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
                                    OnClick="ShowModalDeadLine"/>
@@ -53,7 +54,7 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText >@Ticket.Status.GetDisplayName()</MudText>
-                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
+                @if (Session.DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
                                    OnClick="ShowModalStatus"/>
@@ -68,7 +69,7 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText >@Ticket.Type.GetDisplayName()</MudText>
-                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
+                @if (Session.DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
                                    OnClick="ShowModalType"/>
@@ -83,7 +84,7 @@
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
                 <MudText Color="@(Ticket.Priority is TicketLevelPriority.Hard ? Color.Error : Color.Surface)">@Ticket?.Priority.GetDisplayName()</MudText>
-                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
+                @if (Session.DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
                                    OnClick="ShowModalPriority"/>
@@ -108,7 +109,7 @@
                       StretchItems="StretchItems.None">
                 @foreach (var executor in Ticket.Executors)
                 {
-                    if (DeskToken?.IdentityType == IdentityType.TechSupport)
+                    if (Session.DeskToken?.IdentityType == IdentityType.TechSupport)
                     {
                         <MudChip T="string" Color="Color.Primary" Class="ms-0" OnClose="() => Remove(executor)">
                             @executor.Identity?.LastName @executor.Identity?.FirstName
@@ -125,7 +126,7 @@
                 {
                     <MudText Color="Color.Error">Не назначено</MudText>
                 }
-                @if (DeskToken?.IdentityType == IdentityType.TechSupport)
+                @if (Session.DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Size="Size.Small" OnClick="ShowModalAddExecutor" Icon="@Icons.Material.Filled.Add"/>
                 }
@@ -139,7 +140,6 @@
 @code {
 
     [Parameter] public TicketView Ticket { get; set; } = new();
-    [Parameter] public DeskToken DeskToken { get; set; } = new();
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -152,7 +152,7 @@
     {
         try
         {
-            await TicketExecutorService.RemoveExecutor(executor.Id, DeskToken!.Id);
+            await TicketExecutorService.RemoveExecutor(executor.Id, await Session.GetCurrentAccessToken());
             await LoadTicketDelegate?.Invoke()!;
         }
         catch (Exception e)
@@ -187,7 +187,7 @@
 
     public async Task ShowModalAddExecutor()
     {
-        await DialogService.ShowAssignExecutor(Ticket.Id, DeskToken!.Id);
+        await DialogService.ShowAssignExecutor(Ticket.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
 

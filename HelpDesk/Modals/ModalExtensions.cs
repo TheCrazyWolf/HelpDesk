@@ -1,5 +1,6 @@
 ﻿using HelpDesk.Modals.Devices;
 using HelpDesk.Modals.Tickets;
+using HelpDesk.Models.Dto.Auth;
 using HelpDesk.Models.Dto.Devices;
 using HelpDesk.Models.Dto.Tickets.Tickets;
 using HelpDesk.Models.PLA.Devices;
@@ -53,9 +54,9 @@ public static class ModalExtensions
         await dialog.Result;
     }
     
-    public static async Task ShowAssignExecutor(this IDialogService dialogService, long ticketId, long appointedId, string title = "Назначить нового исполнителя")
+    public static async Task ShowAssignExecutor(this IDialogService dialogService, long ticketId, string title = "Назначить нового исполнителя")
     {
-        var parameters = new DialogParameters<TicketAddExecutor> { { "IdTicket", ticketId }, { "AppointedWhoId", appointedId } };
+        var parameters = new DialogParameters<TicketAddExecutor> { { "IdTicket", ticketId } };
         var dialog = await dialogService.ShowAsync<TicketAddExecutor>(title, parameters);
         await dialog.Result;
     }

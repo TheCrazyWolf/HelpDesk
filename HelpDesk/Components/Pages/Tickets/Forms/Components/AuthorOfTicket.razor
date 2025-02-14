@@ -4,8 +4,10 @@
 @using HelpDesk.Models.PLA.Accounts
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Identity
+@using HelpDesk.Utils
 
 @inject IdentityService IdentityService
+@inject StorageSession StorageSession
 
 <MudText Typo="Typo.subtitle2" Class="mb-4">
     Автор заявки:
@@ -17,7 +19,7 @@
     <MudChatBubble Style="width: 100%">
         @Ticket?.Description
     </MudChatBubble>
-    @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+    @if (StorageSession.DeskToken?.IdentityType is IdentityType.TechSupport)
     {
         <MudChatFooter Class="mt-2 ">
             <MudText Typo="Typo.subtitle2" Class="mb-0" >
@@ -30,7 +32,7 @@
 @code {
 
     [Parameter] public TicketView? Ticket { get; set; } = default!;
-    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
+
     private IdentityView? IdentityView;
 
     protected override async Task OnParametersSetAsync()

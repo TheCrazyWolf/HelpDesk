@@ -1,5 +1,11 @@
-﻿using HelpDesk.Models.DLA.Tickets;
+﻿using HelpDesk.Models.DLA.Identity;
+using HelpDesk.Models.DLA.Tickets;
+using HelpDesk.Models.Dto.Auth;
+using HelpDesk.Models.Dto.Tickets.Executor;
 using HelpDesk.Models.Dto.Tickets.History;
+using HelpDesk.Models.Dto.Tickets.Tickets;
+using HelpDesk.Models.Enums.Extensions;
+using HelpDesk.Models.Enums.Tickets;
 using HelpDesk.Models.PLA.Accounts;
 using HelpDesk.Models.PLA.Tickets;
 using HelpDesk.Services.Documents;
@@ -30,13 +36,92 @@ public class TicketHistoryService(HelpDeskContext ef, DocumentService documentSe
         return items;
     }
     
-    public async Task CreateTicketHistory(TicketHistoryNew ticketHistory)
+    public async Task CreateTicketHistory(TicketHistoryNew ticketHistory, DeskToken? deskToken)
     {
         var ticketHistoryEntity = mapper.Map<TicketHistory>(ticketHistory);
         ticketHistoryEntity.CreatedAt = DateTime.Now;
+        ticketHistoryEntity.UserId = deskToken.Id;
         await ef.AddAsync(ticketHistoryEntity);
         await ef.SaveChangesAsync();
         await documentService.AttachDocumentToTicketHistory(ticketHistoryEntity, ticketHistory.Files.Select(x=> x.Id).ToArray());
     }
-    
+
+    public async Task NewHistoryDeadLine(Ticket ticket, DeskToken deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = ticket.Id,
+            UserId = deskToken.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Назначил(а) новый срок решение заявки: {ticket.Deadline?.ToString("dd.MM.yyyy")}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task NewHistoryStatus(TicketUpdateStatus ticketUpdateStatus, DeskToken deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = ticketUpdateStatus.Id,
+            UserId = deskToken.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Сменил(а) статус заявки на: {ticketUpdateStatus.Status.GetDisplayName()}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task NewHistoryType(TicketUpdateType ticketUpdateType, DeskToken deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = ticketUpdateType.Id,
+            UserId = deskToken.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Изменил(а) категорию заявки на: {ticketUpdateType.Type.GetDisplayName()}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task NewUpdatePriority(TicketUpdatePriority ticketUpdatePriority, DeskToken deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = ticketUpdatePriority.Id,
+            UserId = deskToken.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Установил(а) новый приоритет заявки на: {ticketUpdatePriority.Priority.GetDisplayName()}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task NewHistoryAssignedOfTicket(AssignExecutorTicket assignExecutorTicket, Account? identity, DeskToken deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = assignExecutorTicket.TicketId,
+            UserId = deskToken.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Назначил(а) исполнителя по заявке: {identity?.LastName} {identity?.FirstName} {identity?.MiddleName}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
+
+
+    public async Task NewHistoryUnAssignedOfTicket(TicketExecutor executor, Account? identity, DeskToken? deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = executor.TicketId,
+            UserId = deskToken?.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Снял(а) исполнителя по заявке: {identity?.LastName} {identity?.FirstName} {identity?.MiddleName}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
 }

@@ -3,9 +3,11 @@
 @using HelpDesk.Models.Dto.Tickets.Tickets
 @using HelpDesk.Models.PLA.Documents
 @using HelpDesk.Services.Documents
+@using HelpDesk.Utils
 
 @inject DocumentService DocumentService
 @inject IBlazorDownloadFileService BlazorDownloadFileService
+@inject StorageSession Session
 
 <MudText Class="mb-0">Документы/файлы</MudText>
 <MudForm>
@@ -64,7 +66,7 @@
     {
         try
         {
-            foreach (var file in arg) CreateDto.Files.Add(await DocumentService.UploadFile(file, DeskToken!.Id));
+            foreach (var file in arg) CreateDto.Files.Add(await DocumentService.UploadFile(file, await Session.GetCurrentAccessToken()));
         }
         catch (Exception e)
         {

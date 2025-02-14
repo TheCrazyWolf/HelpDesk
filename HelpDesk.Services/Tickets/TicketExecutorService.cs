@@ -1,9 +1,12 @@
-﻿using HelpDesk.Models.DLA.Tickets;
+﻿using HelpDesk.Models.DLA.Identity;
+using HelpDesk.Models.DLA.Tickets;
+using HelpDesk.Models.Dto.Auth;
 using HelpDesk.Models.Dto.Tickets.Executor;
 using HelpDesk.Models.Dto.Tickets.History;
 using HelpDesk.Models.PLA.Accounts;
 using HelpDesk.Models.PLA.Tickets;
 using HelpDesk.Services.Identity;
+using HelpDesk.Services.ThrowHelpers;
 using HelpDesk.Storage;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -30,30 +33,25 @@ public class TicketExecutorService(
         return executors;
     }
 
-    public async Task AssignNewExecutor(AssignExecutorTicket assignExecutorTicket)
+    public async Task AssignNewExecutor(AssignExecutorTicket assignExecutorTicket, DeskToken? deskToken)
     {
         var executor = mapper.Map<TicketExecutor>(assignExecutorTicket);
+        executor.AppointedWhoId = deskToken.Id;
         await ef.AddAsync(executor);
         await ef.SaveChangesAsync();
         var identity = await identityService.GetAccountById(executor.UserId);
-        if (identity is null) throw new NullReferenceException("Исполнитель не найден");
-        await ticketHistoryService.CreateTicketHistory(
-            new TicketHistoryNew(assignExecutorTicket.TicketId,
-                assignExecutorTicket.AppointedWhoId,
-                $"Назначил(а) исполнителя по заявке: {identity.LastName} {identity.LastName}", false));
+        identity.ThrowIfNull(nameof(Account));
+        await ticketHistoryService.NewHistoryAssignedOfTicket(assignExecutorTicket, identity, deskToken);
     }
 
-    public async Task RemoveExecutor(long idExecutor, long currentAccount)
+    public async Task RemoveExecutor(long idExecutor, DeskToken? deskToken)
     {
         var executor = await ef.TicketExecutors.FirstOrDefaultAsync(x => x.Id == idExecutor);
-        if (executor is null) throw new Exception("Исполнитель не найден");
+        executor.ThrowIfNull(nameof(TicketExecutor));
         ef.Remove(executor);
         await ef.SaveChangesAsync();
         var identity = await identityService.GetAccountById(executor.UserId);
-        if (identity is null) throw new NullReferenceException("Исполнитель не найден");
-        await ticketHistoryService.CreateTicketHistory(
-            new TicketHistoryNew(executor.TicketId,
-                currentAccount,
-                $"Снял(а) исполнителя по заявке: {identity.LastName} {identity.LastName}", false));
+        identity.ThrowIfNull(nameof(Account));
+        await ticketHistoryService.NewHistoryUnAssignedOfTicket(executor, identity, deskToken);
     }
 }
