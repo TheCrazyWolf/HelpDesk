@@ -7,8 +7,8 @@
 <MudText Typo="Typo.subtitle2" Class="mb-4">
     Автор заявки:
 </MudText>
-<MudChat ChatPosition="ChatBubblePosition.Start">
-    <MudAvatar>@IdentityView?.LastName.FirstOrDefault()@IdentityView?.FirstName.FirstOrDefault()</MudAvatar>
+<MudChat ChatPosition="ChatBubblePosition.Start" Color="Color.Primary" ArrowPosition="ChatArrowPosition.Bottom">
+    <MudAvatar Color="Color.Primary">@IdentityView?.LastName.FirstOrDefault()@IdentityView?.FirstName.FirstOrDefault()</MudAvatar>
     <MudChatHeader Name="@($"{IdentityView?.LastName} {IdentityView?.FirstName} {IdentityView?.MiddleName}")"/>
     <MudChatBubble>
         @Ticket?.Description

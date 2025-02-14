@@ -2,6 +2,7 @@
 @using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Models.Enums.Identity
+@using HelpDesk.Models.Enums.Tickets
 @using HelpDesk.Models.PLA.Tickets
 @using HelpDesk.Services.Identity
 @using HelpDesk.Services.Tickets
@@ -11,21 +12,23 @@
 @inject NavigationManager Navigation
 @inject TicketExecutorService TicketExecutorService
 
-<table class="mt-4">
+
+<MudSimpleTable Class="mt-4" Style="overflow-x: auto;" Dense="true" Hover="true" Elevation="0">
+    <tbody>
     <tr>
         <td>
-            <MudText>Место:</MudText>
+            <MudText Typo="Typo.body1">Место:</MudText>
         </td>
         <td>
-            <MudText>@Ticket?.PlaceOfIssue</MudText>
+            <MudText>@Ticket.PlaceOfIssue</MudText>
         </td>
     </tr>
     <tr>
         <td>
-            <MudText>Дата создания:</MudText>
+            <MudText Typo="Typo.body1">Дата создания:</MudText>
         </td>
         <td>
-            <MudText>@Ticket?.CreatedAt</MudText>
+            <MudText Typo="Typo.body1">@Ticket.CreatedAt</MudText>
         </td>
     </tr>
     <tr>
@@ -34,12 +37,11 @@
         </td>
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
-                <MudText>@(Ticket?.Deadline is null ? "Не назначено" : Ticket?.Deadline.Value.ToString("dd.MM.yyyy"))</MudText>
+                <MudText Color="@(Ticket.Deadline is null ? Color.Error : Color.Surface)" >@(Ticket.Deadline is null ? "Не назначено" : Ticket.Deadline.Value.ToString("dd.MM.yyyy"))</MudText>
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="ShowModalDeadLine"
-                                   aria-label="delete"/>
+                                   OnClick="ShowModalDeadLine"/>
                 }
             </MudStack>
         </td>
@@ -50,12 +52,11 @@
         </td>
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
-                <MudText>@Ticket?.Status.GetDisplayName()</MudText>
+                <MudText >@Ticket.Status.GetDisplayName()</MudText>
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="ShowModalStatus"
-                                   aria-label="delete"/>
+                                   OnClick="ShowModalStatus"/>
                 }
             </MudStack>
         </td>
@@ -66,12 +67,11 @@
         </td>
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
-                <MudText>@Ticket?.Type.GetDisplayName()</MudText>
+                <MudText >@Ticket.Type.GetDisplayName()</MudText>
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="ShowModalType"
-                                   aria-label="delete"/>
+                                   OnClick="ShowModalType"/>
                 }
             </MudStack>
         </td>
@@ -82,12 +82,11 @@
         </td>
         <td>
             <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" StretchItems="StretchItems.None">
-                <MudText>@Ticket?.Priority.GetDisplayName()</MudText>
+                <MudText Color="@(Ticket.Priority is TicketLevelPriority.Hard ? Color.Error : Color.Surface)">@Ticket?.Priority.GetDisplayName()</MudText>
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
                     <MudIconButton Class="ms-4" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"
-                                   OnClick="ShowModalPriority"
-                                   aria-label="delete"/>
+                                   OnClick="ShowModalPriority"/>
                 }
             </MudStack>
         </td>
@@ -97,12 +96,12 @@
             <MudText>Последнее обновления заявки:</MudText>
         </td>
         <td>
-            <MudText>@Ticket?.UpdatedAt</MudText>
+            <MudText>@Ticket.UpdatedAt</MudText>
         </td>
     </tr>
     <tr>
         <td>
-            <MudText >Исполнители:</MudText>
+            <MudText>Исполнители:</MudText>
         </td>
         <td>
             <MudStack Row="true" Spacing="0" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center"
@@ -111,21 +110,20 @@
                 {
                     if (DeskToken?.IdentityType == IdentityType.TechSupport)
                     {
-                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Class="ms-0" OnClose="() => Remove(executor)">
+                        <MudChip T="string" Color="Color.Primary" Class="ms-0" OnClose="() => Remove(executor)">
                             @executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
                         </MudChip>
                     }
                     else
                     {
-                        <MudChip T="string" Size="Size.Small" Class="ms-0"
-                                 Color="Color.Default">
+                        <MudChip T="string" Class="ms-0" Color="Color.Primary">
                             @executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
                         </MudChip>
                     }
                 }
                 @if (Ticket!.Executors.Count is 0)
                 {
-                    <MudText>Не назначено</MudText>
+                    <MudText Color="Color.Error">Не назначено</MudText>
                 }
                 @if (DeskToken?.IdentityType == IdentityType.TechSupport)
                 {
@@ -134,7 +132,9 @@
             </MudStack>
         </td>
     </tr>
-</table>
+    </tbody>
+</MudSimpleTable>
+
 
 @code {
 
