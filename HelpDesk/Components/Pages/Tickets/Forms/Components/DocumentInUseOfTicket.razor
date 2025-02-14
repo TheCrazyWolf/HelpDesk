@@ -1,42 +1,29 @@
-﻿@using HelpDesk.Modals
+﻿@using BlazorDownloadFile
 @using HelpDesk.Models.Dto.Auth
-@using HelpDesk.Models.Enums.Extensions
-@using HelpDesk.Models.Enums.Identity
 @using HelpDesk.Models.PLA.Documents
 @using HelpDesk.Models.PLA.Tickets
+@using HelpDesk.Services.Documents
 @using HelpDesk.Services.Tickets
 
 @inject IDialogService DialogService
 @inject TicketExecutorService TicketExecutorService
+@inject DocumentService DocumentService
+@inject IBlazorDownloadFileService BlazorDownloadFileService
 
 <MudText Typo="Typo.subtitle2" Class="mb-0 mt-4">Документы, файлы, фото по заявке</MudText>
 <MudForm>
-    <MudStack Class="mt-4" Row="true" Spacing="0">
-        <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles!">
-            <ActivatorContent>
-                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Create"
-                           Size="Size.Small"
-                           Color="Color.Primary">
-                    Загрузить файл
-                </MudButton>
-            </ActivatorContent>
-        </MudFileUpload>
-    </MudStack>
     <MudList Class="mt-2" T="DeskDocumentView">
         @if (!string.IsNullOrEmpty(_errorMsg))
         {
-        <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
-            @_errorMsg
-        </MudAlert>
+            <MudAlert Severity="Severity.Error" Class="mt-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMsg = string.Empty">
+                @_errorMsg
+            </MudAlert>
         }
         @foreach (var file in Ticket.Files)
         {
-        <MudListItem OnClick="() => DownloadFile(file)" Icon="@Icons.Material.Filled.AttachFile">
-            <code>@file.FileName </code>
-            <MudIconButton Class="ms-4" OnClick="@(() => RemoveFile(file))"
-                           Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Delete"
-                           Color="Color.Error"/>
-        </MudListItem>
+            <MudListItem OnClick="() => DownloadFile(file)" Icon="@Icons.Material.Filled.AttachFile">
+                <code>@file.FileName </code>
+            </MudListItem>
         }
     </MudList>
 </MudForm>
@@ -49,42 +36,16 @@
 
     private string _errorMsg = string.Empty;
 
-    private async Task Remove(TicketExecutorView executor)
+    private async Task DownloadFile(DeskDocumentView file)
     {
         try
         {
-            await TicketExecutorService.RemoveExecutor(executor.Id, DeskToken!.Id);
-            await LoadTicketDelegate?.Invoke()!;
+            var stream = await DocumentService.DownloadFileAsync(file.Id);
+            await BlazorDownloadFileService.DownloadFile(file.FileName, stream.ToArray(), "application/octet-stream");
         }
         catch (Exception e)
         {
+            _errorMsg = e.Message;
         }
     }
-    
-    public async Task ShowModalDeadLine()
-    {
-        await DialogService.ShowUpdateDeadline(Ticket!.Id);
-        await LoadTicketDelegate?.Invoke()!;
-    }
-
-    private Task RemoveDevice(TicketDeviceInUseView device)
-    {
-        throw new NotImplementedException();
-    }
-
-    private Task UploadFiles(IReadOnlyList<IBrowserFile> arg)
-    {
-        throw new NotImplementedException();
-    }
-
-    private Task DownloadFile(DeskDocumentView file)
-    {
-        throw new NotImplementedException();
-    }
-
-    private Task RemoveFile(DeskDocumentView file)
-    {
-        throw new NotImplementedException();
-    }
-
 }

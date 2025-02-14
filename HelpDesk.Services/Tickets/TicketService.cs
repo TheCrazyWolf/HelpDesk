@@ -23,6 +23,7 @@ public class TicketService(
         var dto = mapper.Map<TicketView>(ticket);
         dto.Devices = await deviceInUseService.GetDevicesByTicket(idTicket);
         dto.Executors = await ticketExecutorService.GetExecutorsByTicket(idTicket);
+        dto.Files = await documentService.GetDocumentByTicket(idTicket);
         return dto;
     }
 
