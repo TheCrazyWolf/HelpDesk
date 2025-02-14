@@ -65,11 +65,7 @@
         </MudStack>
     </EditForm>
 }
-<MudStack Class="mt-4" Row="true" Spacing="0">
-    @if (DeskToken?.IdentityType is IdentityType.TechSupport)
-    {
-    }
-</MudStack>
+
 @foreach (var message in Ticket.Chat)
 {
     @if (message.IsHideForUser && DeskToken?.IdentityType is not IdentityType.TechSupport) continue;
@@ -79,12 +75,12 @@
             @message.CreatedBy?.LastName.FirstOrDefault()@message.CreatedBy?.FirstName.FirstOrDefault()
         </MudAvatar>
         <MudChatHeader Name="@($"{message.CreatedBy?.LastName} {message.CreatedBy?.FirstName} {message.CreatedBy?.MiddleName}")" Time="@message.CreatedAt.ToString()"/>
-        <MudChatBubble>
+        <MudChatBubble Style="width: 100%;">
             @message.Message
         </MudChatBubble>
         @if (message.Files.Count != 0)
         {
-            <MudChatBubble >
+            <MudChatBubble Style="width: 100%;">
                 <MudStack Row="false" Spacing="0">
                     @foreach (var file in message.Files)
                     {

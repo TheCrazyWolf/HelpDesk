@@ -111,13 +111,13 @@
                     if (DeskToken?.IdentityType == IdentityType.TechSupport)
                     {
                         <MudChip T="string" Color="Color.Primary" Class="ms-0" OnClose="() => Remove(executor)">
-                            @executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
+                            @executor.Identity?.LastName @executor.Identity?.FirstName
                         </MudChip>
                     }
                     else
                     {
                         <MudChip T="string" Class="ms-0" Color="Color.Primary">
-                            @executor.Identity?.LastName @executor.Identity?.FirstName.FirstOrDefault().
+                            @executor.Identity?.LastName @executor.Identity?.FirstName
                         </MudChip>
                     }
                 }

@@ -31,9 +31,11 @@
         {
             <MudListItem Icon="@Icons.Material.Filled.Devices">
                 <code>@device.Device?.Type.GetDisplayName() №@device.Device?.InvNumber</code>
-                <MudIconButton OnClick="@(() => RemoveDevice(device))" Size="Size.Small" Variant="Variant.Outlined"
-                               Class="ms-4"
-                               Icon="@Icons.Material.Filled.Delete" Color="Color.Error"/>
+                @if (DeskToken?.IdentityType is IdentityType.TechSupport)
+                {
+                    <MudIconButton OnClick="@(() => RemoveDevice(device))" Size="Size.Small" 
+                                   Variant="Variant.Outlined"Class="ms-4"Icon="@Icons.Material.Filled.Delete" Color="Color.Error"/>
+                }
             </MudListItem>
         }
     </MudList>
@@ -56,13 +58,8 @@
         }
         catch (Exception e)
         {
+            _errorMsg = e.Message;
         }
-    }
-    
-    public async Task ShowModalDeadLine()
-    {
-        await DialogService.ShowUpdateDeadline(Ticket!.Id);
-        await LoadTicketDelegate?.Invoke()!;
     }
 
     private Task RemoveDevice(TicketDeviceInUseView device)
