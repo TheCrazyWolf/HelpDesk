@@ -107,7 +107,7 @@
         <td>
             <MudStack Row="true" Spacing="0" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center"
                       StretchItems="StretchItems.None">
-                @foreach (var executor in Executors)
+                @foreach (var executor in Ticket.Executors)
                 {
                     if (DeskToken?.IdentityType == IdentityType.TechSupport)
                     {
@@ -123,7 +123,7 @@
                         </MudChip>
                     }
                 }
-                @if (Executors.Count is 0)
+                @if (Ticket!.Executors.Count is 0)
                 {
                     <MudText>Не назначено</MudText>
                 }
@@ -138,16 +138,15 @@
 
 @code {
 
-    [Parameter] public TicketView? Ticket { get; set; } = default!;
-    [Parameter] public DeskToken? DeskToken { get; set; } = default!;
+    [Parameter] public TicketView Ticket { get; set; } = new();
+    [Parameter] public DeskToken DeskToken { get; set; } = new();
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
-    [Parameter] public  IList<TicketExecutorView> Executors { get; set; }  = new List<TicketExecutorView>();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
     }
-    
+
 
     private async Task Remove(TicketExecutorView executor)
     {
@@ -158,38 +157,37 @@
         }
         catch (Exception e)
         {
-           
         }
     }
 
 
     public async Task ShowModalDeadLine()
     {
-        await DialogService.ShowUpdateDeadline(Ticket!.Id);
+        await DialogService.ShowUpdateDeadline(Ticket.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
 
     public async Task ShowModalStatus()
     {
-        await DialogService.ShowUpdateStatus(Ticket!.Id);
+        await DialogService.ShowUpdateStatus(Ticket.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
 
     public async Task ShowModalType()
     {
-        await DialogService.ShowUpdateType(Ticket!.Id);
+        await DialogService.ShowUpdateType(Ticket.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
 
     public async Task ShowModalPriority()
     {
-        await DialogService.ShowUpdatePriority(Ticket!.Id);
+        await DialogService.ShowUpdatePriority(Ticket.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
 
     public async Task ShowModalAddExecutor()
     {
-        await DialogService.ShowAssignExecutor(Ticket!.Id, DeskToken!.Id);
+        await DialogService.ShowAssignExecutor(Ticket.Id, DeskToken!.Id);
         await LoadTicketDelegate?.Invoke()!;
     }
 

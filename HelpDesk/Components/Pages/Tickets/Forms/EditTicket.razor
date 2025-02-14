@@ -7,7 +7,6 @@
 @using HelpDesk.Components.Pages.Tickets.Forms.Components
 
 @inject TicketService TicketService
-@inject TicketExecutorService TicketExecutorService
 @inject StorageSession Session
 
 <MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">@_ticket?.Title</MudText>
@@ -25,9 +24,10 @@
         <MudPaper Class="mt-2" Elevation="0">
             <MudForm>
                 <AuthorOfTicket Ticket="_ticket"/>
-                <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken" 
-                                 Executors="_executors"
+                <DetailsOfTicket Ticket="_ticket" DeskToken="_deskToken"
                                  LoadTicketDelegate="_loadTicketDelegate"/>
+                <DeviceInUseOfTicket Ticket="_ticket" DeskToken="_deskToken"
+                                     LoadTicketDelegate="_loadTicketDelegate"/>
             </MudForm>
         </MudPaper>
         <MudPaper Class="mt-2" Elevation="0">
@@ -53,30 +53,27 @@
 
     [Parameter] public long Id { get; set; }
     private string _errorMsg = string.Empty;
-    private TicketView? _ticket;
-    private DeskToken? _deskToken;
-    private IList<TicketExecutorView> _executors = new List<TicketExecutorView>();
-    
-    
+    private TicketView _ticket = new ();
+    private DeskToken _deskToken = new ();
+
     public delegate Task LoadTicketDelegate();
+
     public LoadTicketDelegate? _loadTicketDelegate;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _deskToken = await Session.GetCurrentAccessToken();
-        if (_deskToken is null) return;
+        _deskToken = await Session.GetCurrentAccessToken() ?? throw new Exception("Invalid token");
         _loadTicketDelegate += LoadTicket;
         await LoadTicket();
     }
-    
+
 
     public async Task LoadTicket()
     {
         try
         {
             _ticket = await TicketService.GetTicket(Id);
-            _executors = await TicketExecutorService.GetExecutorsByTicket(Id);
             StateHasChanged();
         }
         catch (Exception e)

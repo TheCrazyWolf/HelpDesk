@@ -15,4 +15,6 @@ public class TicketView : PlaEntity
     public DateTime? Deadline { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public long? UserId { get; set; }
+    public IList<TicketExecutorView> Executors { get; set; } = new List<TicketExecutorView>();
+    public IList<TicketDeviceInUseView> Devices { get; set; } = new List<TicketDeviceInUseView>();
 }

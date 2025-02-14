@@ -1,4 +1,6 @@
 ﻿using HelpDesk.Models.DLA.Devices;
+using HelpDesk.Models.PLA.Devices;
+using HelpDesk.Models.PLA.Tickets;
 using HelpDesk.Storage;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -21,5 +23,17 @@ public class DeviceInUseService(HelpDeskContext ef, IMapper mapper)
         }
 
         await ef.SaveChangesAsync();
+    }
+
+    public async Task<IList<TicketDeviceInUseView>> GetDevicesByTicket(long idTicket)
+    {
+        return await ef.DeviceInUseTickets.Include(x => x.Device)
+            .Where(x => x.TicketId == idTicket)
+            .Select(x=> new TicketDeviceInUseView()
+            {
+                Id = x.Id,
+                Device = new DeviceView(x.Device)
+            })
+            .ToListAsync();
     }
 }
