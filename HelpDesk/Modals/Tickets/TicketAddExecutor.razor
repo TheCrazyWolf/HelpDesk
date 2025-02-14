@@ -22,6 +22,7 @@
                     </MudAlert>
                 }
                 <MudSelect @bind-Value="_ticketUpdate.UserId" Label="Выберите исполнителя">
+                    <MudSelectItem T="long" Value="0">Не назначено</MudSelectItem>
                     @foreach (var identity in _identityViews)
                     {
                         <MudSelectItem Value="@identity.Id">@identity.LastName @identity.FirstName @identity.MiddleName</MudSelectItem>
