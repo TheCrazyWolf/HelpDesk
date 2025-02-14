@@ -2,12 +2,14 @@
 @using HelpDesk.Models.Enums.Devices
 @using HelpDesk.Models.Enums.Extensions
 @using HelpDesk.Services.Devices
+@using HelpDesk.Utils
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 
 @inject DeviceService DeviceService
 @inject DeviceInUseService DeviceServiceInUser
+@inject StorageSession Session
 
 <EditForm Model="@DeviceDto" OnValidSubmit="SubmitAsync">
     <DataAnnotationsValidator/>
@@ -50,7 +52,7 @@
         try
         {
             var view = await DeviceService.CreateOrUpdate(DeviceDto);
-            await DeviceServiceInUser.AttachDeviceToTicket([view.InvNumber], IdTicket);
+            await DeviceServiceInUser.AttachDeviceToTicket([view], IdTicket, await Session.GetCurrentAccessToken());
             MudDialog.Close();
         }
         catch (Exception e)

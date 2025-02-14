@@ -1,4 +1,5 @@
-﻿using HelpDesk.Models.DLA.Identity;
+﻿using HelpDesk.Models.DLA.Devices;
+using HelpDesk.Models.DLA.Identity;
 using HelpDesk.Models.DLA.Tickets;
 using HelpDesk.Models.Dto.Auth;
 using HelpDesk.Models.Dto.Tickets.Executor;
@@ -7,6 +8,7 @@ using HelpDesk.Models.Dto.Tickets.Tickets;
 using HelpDesk.Models.Enums.Extensions;
 using HelpDesk.Models.Enums.Tickets;
 using HelpDesk.Models.PLA.Accounts;
+using HelpDesk.Models.PLA.Devices;
 using HelpDesk.Models.PLA.Tickets;
 using HelpDesk.Services.Documents;
 using HelpDesk.Storage;
@@ -120,6 +122,32 @@ public class TicketHistoryService(HelpDeskContext ef, DocumentService documentSe
             UserId = deskToken?.Id,
             CreatedAt = DateTime.Now,
             Message = $"Снял(а) исполнителя по заявке: {identity?.LastName} {identity?.FirstName} {identity?.MiddleName}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task NewHistoryAttachDevice(DeviceView deviceView, DeviceInUseTicket deviceInUser, DeskToken deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = deviceInUser.TicketId,
+            UserId = deskToken?.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Добавил(а) устройство в заявку: {deviceView.Type.GetDisplayName()} инв. № {deviceView.InvNumber}"
+        };
+        await ef.AddAsync(history);
+        await ef.SaveChangesAsync();
+    }
+
+    public async Task NewHistoryUnAttachedDevice(DeviceInUseTicket deviceInUse, DeskToken deskToken)
+    {
+        var history = new TicketHistory
+        {
+            TicketId = deviceInUse.TicketId,
+            UserId = deskToken?.Id,
+            CreatedAt = DateTime.Now,
+            Message = $"Удалил(а) устройство из заявки: {deviceInUse.Device?.Type.GetDisplayName()} инв. № {deviceInUse.Device?.InvNumber}"
         };
         await ef.AddAsync(history);
         await ef.SaveChangesAsync();

@@ -1,6 +1,5 @@
 ﻿@page "/tickets/form/{id:long}/"
 
-@using HelpDesk.Models.Dto.Auth
 @using HelpDesk.Services.Tickets
 @using HelpDesk.Utils
 @using HelpDesk.Models.PLA.Tickets
@@ -10,8 +9,9 @@
 @inject TicketService TicketService
 @inject StorageSession Session
 
-<MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">@_ticket?.Title</MudText>
-<MudText Typo="Typo.body2" GutterBottom="true" Align="Align.Start">№ @_ticket?.Id</MudText>
+<PageTitle>@_ticket.Title</PageTitle>
+<MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Start">@_ticket.Title</MudText>
+<MudText Typo="Typo.body2" GutterBottom="true" Align="Align.Start">№ @_ticket.Id</MudText>
 
 @if (!string.IsNullOrEmpty(_errorMsg))
 {
@@ -28,7 +28,7 @@
                 <AuthorOfTicket Ticket="_ticket" />
                 <DetailsOfTicket Ticket="_ticket"
                                  LoadTicketDelegate="_loadTicketDelegate"/>
-                @if (_deskToken.IdentityType is not IdentityType.Student)
+                @if (Session.DeskToken?.IdentityType is not IdentityType.Student)
                 {
                     <DeviceInUseOfTicket Ticket="_ticket" 
                                          LoadTicketDelegate="_loadTicketDelegate"/>
@@ -52,7 +52,6 @@
     [Parameter] public long Id { get; set; }
     private string _errorMsg = string.Empty;
     private TicketView _ticket = new();
-    private DeskToken _deskToken = new();
 
     public delegate Task LoadTicketDelegate();
 
@@ -61,7 +60,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _deskToken = await Session.GetCurrentAccessToken();
+        await Session.GetCurrentAccessToken();
         _loadTicketDelegate += LoadTicket;
         await LoadTicket();
     }
@@ -72,7 +71,7 @@
         try
         {
             _ticket = await TicketService.GetTicket(Id) ?? throw new Exception("Не удалось загрузить тикет");
-            if ((_ticket.UserId != _deskToken.Id) && _deskToken.IdentityType is not IdentityType.TechSupport)
+            if ((_ticket.UserId != Session.DeskToken?.Id) && Session.DeskToken?.IdentityType is not IdentityType.TechSupport)
             {
                 _ticket = new TicketView();
                 throw new Exception("У вас нет прав на просмотр заявок, которые Вы не создавали");

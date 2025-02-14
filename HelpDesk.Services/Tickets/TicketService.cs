@@ -40,7 +40,7 @@ public class TicketService(
         await ef.AddAsync(ticketEntity);
         await ef.SaveChangesAsync();
         await documentService.AttachDocumentToTicket(ticketEntity, ticket.Files.Select(x => x.Id).ToArray());
-        await deviceInUseService.AttachDeviceToTicket(ticket.Devices.Select(x => x.InvNumber), ticketEntity.Id);
+        await deviceInUseService.AttachDeviceToTicket(ticket.Devices, ticketEntity.Id);
         return ticketEntity.Id;
     }
 

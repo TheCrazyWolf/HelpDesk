@@ -54,25 +54,12 @@
     [Parameter] public EditTicket.LoadTicketDelegate? LoadTicketDelegate { get; set; }
 
     private string _errorMsg = string.Empty;
-
-    private async Task Remove(TicketExecutorView executor)
-    {
-        try
-        {
-            await TicketExecutorService.RemoveExecutor(executor.Id, await Session.GetCurrentAccessToken());
-            await LoadTicketDelegate?.Invoke()!;
-        }
-        catch (Exception e)
-        {
-            _errorMsg = e.Message;
-        }
-    }
-
+    
     private async Task RemoveDevice(TicketDeviceInUseView device)
     {
         try
         {
-            await DeviceServiceInUser.RemoveDeviceFromTicket(device.Id);
+            await DeviceServiceInUser.RemoveDeviceFromTicket(device.Id, await Session.GetCurrentAccessToken());
             await LoadTicketDelegate?.Invoke()!;
         }
         catch (Exception e)
